@@ -152,14 +152,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = '/chefmenu/site/public/static'
-STATICFILES_DIRS = [
-     BASE_DIR.joinpath('static')
+if DEBUG:
+    STATIC_URL = '/static/'
+    STATICFILES_DIRS = [
+        BASE_DIR.joinpath('static')
+    ]
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR.joinpath('media')
+else:
+    STATIC_URL = 'static/'
+    STATIC_ROOT = '/chefmenu/site/public/static'
+    STATICFILES_DIRS = [
+        BASE_DIR.joinpath('static')
 
-]
-MEDIA_URL='media/'
-MEDIA_ROOT = '/chefmenu/site/public/media'
+    ]
+    MEDIA_URL='media/'
+    MEDIA_ROOT = '/chefmenu/site/public/media'
 #AWS_ACCESS_KEY_ID = env.str("ACCESS_KEY_ID")
 #AWS_SECRET_ACCESS_KEY = env.str("ACCESS_SECRET_KEY")
 #AWS_STORAGE_BUCKET_NAME = 'chefmenu'

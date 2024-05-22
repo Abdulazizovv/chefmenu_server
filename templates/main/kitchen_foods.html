@@ -90,7 +90,7 @@ Menu
     width: 40px;
     height: 40px;
     border: none;
-    background-color: #1f487e;
+    background-color: #ff6b6b;
     color: #fff;
     font-size: 18px;
     border-radius: 50%;
@@ -99,7 +99,7 @@ Menu
   }
 
   .quantity-control-btn:hover {
-    background-color: #1d3461;
+    background-color: #ff6b6b;
   }
 
   .quantity {
@@ -109,19 +109,7 @@ Menu
     color: #333;
   }
 
-  /* Badge Style */
-  .badge {
-    background-color: #dc3545;
-    color: #fff;
-    border-radius: 50%;
-    padding: 5px 10px;
-    font-size: 14px;
-    font-weight: bold;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    transition: all 0.3s ease;
-  }
+  
 </style>
 
 <nav class="container mb-3 sticky-nav">
@@ -151,9 +139,9 @@ Menu
             <p class="card-price">Narxi: {{ food.price }} so'm</p>
             <div class="select-section">
               {% if cart|dict_key:food.id %}
-                <button class="btn btn-primary quantity-control-btn" data-action="add" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">+</button>
-                <span class="quantity">{{ cart|get_quantity:food.id }}</span>
-                <button class="btn btn-primary quantity-control-btn" data-action="remove" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">-</button>
+              <button class="btn btn-primary quantity-control-btn" data-action="remove" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">-</button>
+              <span class="quantity">{{ cart|get_quantity:food.id }}</span>
+              <button class="btn btn-primary quantity-control-btn" data-action="add" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">+</button>
               {% else %}
                 <button class="btn btn-primary add-to-cart" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">Savatga qo'shish <i class="fas fa-cart-plus"></i></button>
               {% endif %}
@@ -171,24 +159,28 @@ Menu
 
 <nav class="navbar fixed-bottom bottom-navbar navbar-expand-lg navbar-light bg-light pt-0">
   <div class="container-fluid">
-      <a class="nav-link" href="{% url "main:menu" kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
-      <a class="nav-link" href="{% url "main:foods" kitchen.slug %}"><i class="fas fa-utensils navbar-icon"></i><span class="d-none d-lg-inline"> Taomlar</span></a>
-      <a class="nav-link" href="{% url 'cart:cart' kitchen.id %}"><i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Savatcha</span></a>
-      <a class="nav-link" href="{% url "main:kitchen_info" kitchen.slug %}"><i class="fas fa-info-circle navbar-icon"></i></i></i><span class="d-none d-lg-inline">Ma'lumot</span></a>
-      <a class="nav-link" href="{% url "review:kitchen" kitchen.id %}"><i class="fas fa-comments navbar-icon"></i></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
+    <a class="nav-link" href="{% url 'main:menu' kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
+    <a class="nav-link" href="{% url 'main:foods' kitchen.slug %}"><i class="fas fa-utensils navbar-icon"></i><span class="d-none d-lg-inline"> Taomlar</span></a>
+    <a class="nav-link position-relative" href="{% url 'cart:cart' kitchen.id %}">
+      <i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Savatcha</span>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        {{total_quantity}}
+      <span class="visually-hidden">Savatdagi taomlar soni</span>
+    </a>
+    <a class="nav-link" href="{% url 'main:kitchen_info' kitchen.slug %}"><i class="fas fa-info-circle navbar-icon"></i><span class="d-none d-lg-inline">Ma'lumot</span></a>
+    <a class="nav-link" href="{% url 'review:kitchen' kitchen.id %}"><i class="fas fa-comments navbar-icon"></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
   </div>
 </nav>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 <script>
-  
   $(document).ready(function() {
     $(document).on('click', '.add-to-cart', function(event) {
       event.preventDefault();
       var $button = $(this);
       var productId = $button.data('product-id');
       var kitchenId = $button.data('kitchen-id');
-  
+
       $.ajax({
         url: '{% url "cart:add_cart" %}',
         method: 'POST',
@@ -198,21 +190,21 @@ Menu
         success: function(response) {
           console.log('Product added to cart successfully!');
           updateCartButton($button, response.cart[productId]);
-          $('.badge').text(response.cart_total);
+          updateBadge(response.total_quantity);
         },
         error: function(xhr, status, error) {
           console.error('Failed to add product to cart:', error);
         }
       });
     });
-  
+
     $(document).on('click', '.quantity-control-btn', function(event) {
       event.preventDefault();
       var $button = $(this);
       var productId = $button.data('product-id');
       var kitchenId = $button.data('kitchen-id');
       var action = $button.data('action');
-  
+
       $.ajax({
         url: action === 'add' ? '{% url "cart:add_cart" %}' : '{% url "cart:decrement_cart" %}',
         method: 'POST',
@@ -223,25 +215,25 @@ Menu
           console.log('Product quantity updated successfully!', response);
           if (!response.cart[productId]) {
             $button.parent('.select-section').html("<button class='btn btn-primary add-to-cart' data-product-id='" + productId + "' data-kitchen-id='" + kitchenId + "'>Savatga qo'shish <i class='fas fa-cart-plus'></i></button>");
-          } else (
-            updateQuantity($button, response.cart[productId].quantity)
-          )
-          $('.badge').text(response.cart_total);
+          } else {
+            updateQuantity($button, response.cart[productId].quantity);
+          }
+          updateBadge(response.total_quantity);
         },
         error: function(xhr, status, error) {
           console.error('Failed to update product quantity:', error);
         }
       });
     });
-  
+
     function updateCartButton($button, item) {
       if (item.quantity > 0) {
-        $button.parent('.select-section').html("<button class='btn btn-primary quantity-control-btn' data-action='add' data-product-id='" + item.product_id + "' data-kitchen-id='" + item.kitchen_id + "'>+</button><span class='quantity'>" + item.quantity + "</span><button class='btn btn-primary quantity-control-btn' data-action='remove' data-product-id='" + item.product_id + "' data-kitchen-id='" + item.kitchen_id + "'>-</button>");
+        $button.parent('.select-section').html("<button class='btn btn-primary quantity-control-btn' data-action='remove' data-product-id='" + item.product_id + "' data-kitchen-id='" + item.kitchen_id + "'>-</button><span class='quantity'>" + item.quantity + "</span><button class='btn btn-primary quantity-control-btn' data-action='add' data-product-id='" + item.product_id + "' data-kitchen-id='" + item.kitchen_id + "'>+</button>");
       } else {
         $button.replaceWith("<button class='btn btn-primary add-to-cart' data-product-id='" + item.product_id + "' data-kitchen-id='" + item.kitchen_id + "'>Savatga qo'shish <i class='fas fa-cart-plus'></i></button>");
       }
     }
-  
+
     function updateQuantity($button, quantity) {
       $button.siblings('.quantity').text(quantity);
       var $parent = $button.parent('.select-section');
@@ -249,6 +241,10 @@ Menu
         console.log("works")
         $parent.find('.quantity-control-btn').remove();
       }
+    }
+
+    function updateBadge(cartTotal) {
+      $('.badge').text(cartTotal);
     }
   });
 
@@ -263,9 +259,6 @@ Menu
     var priceFormatted = formatPrice(priceText);
     $(this).text(priceFormatted);
   });
-    
-  
-
 </script>
 
 {% endblock content %}

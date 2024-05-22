@@ -83,7 +83,8 @@ def decrement_cart(request):
         response = {
             'status': 'success',
             'cart': cart,
-            'total_price': cart.get_total_price()  # Add 'total_price' key to the response dictionary
+            'total_price': cart.get_total_price(),  # Add 'total_price' key to the response dictionary
+            'total_quantity': cart.get_total_quantity(),
         }
     return Response(response)
 

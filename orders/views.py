@@ -150,9 +150,9 @@ def make_order(request):
                     messages.error(request, 'Stol tanlanmagan yoki bu oshxona buyurtmalarni qabul qilmayabdi!')
                     return redirect('main:menu', slug=kitchen.slug)
             else:
-                messages.error(request, 'Xodimlar buyurtmalar qabul qila olmaydi!')
+                messages.error(request, 'Oshxona buyurtmalar qabul qila olmaydi!')
         else:
-            messages.error(request, 'Xodimlar tanlanmagan!')
+            messages.error(request, 'Oshxona tanlanmagan!')
             return redirect('orders:order_detail', kitchen_id=kitchen_id)
 
     else:

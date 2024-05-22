@@ -27,7 +27,9 @@ Buyurtmalar
                 </div>
                 
                 <div class="card-body">
-                    <h5 class="card-title">Buyurtma Holati: 
+                    <h5 class="card-title">
+                        Stol: {{ order.table.number }} <br>
+                        Buyurtma Holati: 
                         {% if order.status == "new" %}
                         <span class="badge badge-pill badge-success">Yangi</span>
                         {% elif order.status == "in_progress" %}

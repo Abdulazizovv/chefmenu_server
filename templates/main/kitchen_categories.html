@@ -141,7 +141,12 @@
     <div class="container-fluid">
         <a class="nav-link" href="{% url "main:menu" kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
         <a class="nav-link" href="{% url "main:foods" kitchen.slug %}"><i class="fas fa-utensils navbar-icon"></i><span class="d-none d-lg-inline"> Taomlar</span></a>
-        <a class="nav-link" href="{% url 'cart:cart' kitchen.id %}"><i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Savatcha</span></a>
+        <a class="nav-link position-relative" href="{% url 'cart:cart' kitchen.id %}">
+            <i class="fas fa-shopping-cart navbar-icon"></i><span class="d-none d-lg-inline"> Savatcha</span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{total_quantity}}
+            <span class="visually-hidden">Savatdagi taomlar soni</span>
+          </a>
         <a class="nav-link" href="{% url "main:kitchen_info" kitchen.slug %}"><i class="fas fa-info-circle navbar-icon"></i></i></i><span class="d-none d-lg-inline">Ma'lumot</span></a>
         <a class="nav-link" href="{% url "review:kitchen" kitchen.id %}"><i class="fas fa-comments navbar-icon"></i></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
     </div>

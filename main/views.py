@@ -211,11 +211,13 @@ def kitchen_detail(request, slug):
     kitchen = get_object_or_404(Kitchen, slug=slug)
     comments = ReviewKitchen.objects.filter(kitchen=kitchen).order_by("-created")
     categories = FoodCategory.objects.filter(kitchen=kitchen)
+    total_quantity = Cart(request).get_total_quantity()
     context = {
         "kitchen": kitchen,
         "categories": categories,
         "table": table,
         "comments_count": comments.count(),
+        "total_quantity": total_quantity,
     }
     return render(request, "main/kitchen_categories.html", context=context)
 
@@ -226,11 +228,13 @@ def kitchen_foods(request, slug):
 
     foods = Food.objects.filter(kitchen=kitchen)
     cart = Cart(request)
+    total_quantity = cart.get_total_quantity()
     context = {
         "kitchen": kitchen, 
         "categories": categories,
         "foods": foods,
         "cart": cart,
+        "total_quantity": total_quantity
     }
     return render(request, "main/kitchen_foods.html", context=context)
 
