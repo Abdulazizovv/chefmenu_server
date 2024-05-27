@@ -12,7 +12,7 @@ def index(request):
     page = request.GET.get("page" or None)
     user = request.user
     kitchen = user.kitchen
-    all_tables = kitchen.tables.all()
+    all_tables = kitchen.tables.all().order_by('number')
     paginator = Paginator(all_tables, 10)
     try:
         tables = paginator.page(page)
