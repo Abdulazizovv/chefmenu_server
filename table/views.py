@@ -3,9 +3,15 @@ from django.shortcuts import redirect, render
 from menu.decorators import only_kitchen
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from users.models import Kitchen
 from table.models import Table
-
+import zipfile
+from io import BytesIO
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.conf import settings
+from django.core.files.storage import default_storage
+import os
 
 @only_kitchen
 def index(request):
@@ -76,3 +82,24 @@ def edit_table(request):
         return redirect('table:index')
     messages.error(request, 'Get request is not allowed for this route')
     return redirect('table:index')
+
+
+
+def download_qr_codes(request, kitchen_id):
+    kitchen = get_object_or_404(Kitchen, pk=kitchen_id)
+    zip_buffer = BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
+        for table in Table.objects.filter(kitchen=kitchen):
+            if table.qr_code:
+                qr_code_path = os.path.join(settings.MEDIA_ROOT, table.qr_code.name)
+                with default_storage.open(qr_code_path, 'rb') as qr_file:
+                    qr_code_content = qr_file.read()
+                qr_code_filename = f"kitchen_{kitchen.id}_table_{table.number}_qr.png"
+                zip_file.writestr(qr_code_filename, qr_code_content)
+
+    zip_buffer.seek(0)
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename=kitchen_{kitchen.id}_qr_codes.zip'
+
+    return response

@@ -136,7 +136,7 @@ Menu
           <img src="{{ food.image.url }}" alt="{{ food.name }}" class="card-img-top">
           <div class="card-body-details">
             <h5 class="card-title">{{ food.name }}</h5>
-            <p class="card-price">Narxi: {{ food.price }} so'm</p>
+            <p class="card-text"><b>Narxi: {{ food.price }} so'm</b></p>
             <div class="select-section">
               {% if cart|dict_key:food.id %}
               <button class="btn btn-primary quantity-control-btn" data-action="remove" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">-</button>

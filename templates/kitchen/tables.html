@@ -6,10 +6,28 @@
 <style>
     .table-container {
         padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     .table-responsive {
         border-radius: 15px;
         overflow: auto;
+    }
+    .modal-header {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-close {
+        color: white;
+    }
+    .btn-primary, .btn-danger, .btn-success, .btn-info {
+        margin-right: 5px;
+    }
+    .badge {
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
     }
     /* Additional styling for responsiveness */
     @media (max-width: 768px) {
@@ -20,9 +38,9 @@
     }
 </style>
 
-<div class="container">
+<div class="container mt-5">
     {% if tables %}
-    <h1 class="text-center mt-5 mb-4">Stollar</h1>
+    <h1 class="text-center mb-4">Stollar</h1>
     <!-- Button to trigger modal -->
     <div class="d-flex justify-content-between mb-3">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTableModal">
@@ -31,6 +49,12 @@
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTableModal">
             O'chirish <i class="fas fa-minus"></i>
         </button>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Button to download all QR codes -->
+        <a href="{% url 'table:download_qr_codes' request.user.kitchen.id %}" class="btn btn-success">
+            Barcha QR Kodlarni Yuklab Olish <i class="fas fa-download"></i>
+        </a>
     </div>
 
     <!-- Add Table Modal -->
@@ -42,7 +66,7 @@
     <div class="table-container">
         <div class="table-responsive">
             <table class="table table-hover table-striped">
-                <thead>
+                <thead class="table-dark">
                     <tr>
                         <th scope="col">Stol raqami</th>
                         <th scope="col">Status</th>
@@ -65,7 +89,6 @@
                         </td>
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTableModal{{table.id}}"><i class="fas fa-edit"></i></button>
-                            
                         </td>
                         <td>
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#qrCodeModal{{ table.id }}">
@@ -123,7 +146,6 @@
     {% endif %}
 </div>
 
-
 <div class="row">
     <div class="demo">
         <nav class="pagination-outer" aria-label="Page navigation">
@@ -134,9 +156,8 @@
                     </a>
                 </li>
                 {% for page_num in tables.paginator.page_range %}
-                
                 {% if page_num >= tables.number|add:'-3' and page_num <= tables.number|add:'3' %}
-                        <li class="page-item {% if page_num == tables.number %}active{% endif %}"><a class="page-link " href="?page={{page_num}}">{{page_num}}</a></li>
+                        <li class="page-item {% if page_num == tables.number %}active{% endif %}"><a class="page-link" href="?page={{page_num}}">{{page_num}}</a></li>
                 {% endif %}
                 {% endfor %}
                 <li class="page-item {% if not tables.has_next %} disabled{% endif %}">
@@ -148,8 +169,6 @@
         </nav>
     </div>
 </div>
-
-
 
 <!-- JavaScript for form validation -->
 <script>
@@ -180,7 +199,6 @@
         newWindow.document.close();
         newWindow.print();
     }
-
 
     function downloadQRCode(imageId) {
         var img = document.getElementById(imageId);
