@@ -135,7 +135,7 @@ def register_kitchen(request):
 def kitchen_user_profile(request):
     if request.method == "POST":
         name = request.POST.get('name' or None)
-        image = request.POST.get('image' or None)
+        image = request.FILES.get('image' or None)
         user = request.user
         print(user.profile.picture)
         if image:
