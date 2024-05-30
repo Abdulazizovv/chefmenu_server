@@ -133,7 +133,18 @@ def register_kitchen(request):
 
 @only_kitchen
 def kitchen_user_profile(request):
-    
+    if request.method == "POST":
+        name = request.POST.get('name' or None)
+        image = request.POST.get('image' or None)
+        user = request.user
+        print(user.profile.picture)
+        if image:
+            user.profile.picture = image
+            user.profile.save()
+        user.full_name = name
+        user.save()
+        messages.success(request, 'Muvaffaqqiyatli saqlandi!')
+        return redirect('main:kitchen_user_profile')
     return render(request, "kitchen/user_profile.html")
 
 

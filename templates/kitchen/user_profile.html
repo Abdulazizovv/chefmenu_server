@@ -30,11 +30,11 @@ Profil
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <form method="POST"> {% csrf_token %}
             <div class="modal-body">
-                <form method="POST"> {% csrf_token %}
                     <div class="form-group">
                         <label for="name">Ism</label>
-                        <input type="text" class="form-control" name="name" value="{{request.user.full_name}}">
+                        <input type="text" class="form-control" name="name" value="{% if request.user.full_name %}{{request.user.full_name}}{% endif %}">
                     </div>
                     {% comment %} <div class="form-group">
                         <label for="phone">Phone</label>
@@ -44,13 +44,13 @@ Profil
                         <label for="user-image">Surat</label>
                         <input type="file" class="form-control" name="image">
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiqish</button>
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiqish</button>
-                <button type="button" class="btn btn-primary">Saqlash</button>
-            </div>
-        </div>
+            </form>
     </div>
 </div>
 {% endblock content %}

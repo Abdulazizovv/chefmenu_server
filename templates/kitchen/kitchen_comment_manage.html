@@ -1,56 +1,85 @@
 {% extends "kitchen/base.html" %}
 {% load uzbek_timesince %}
 {% block title %}
-
 Sharhlar
-
 {% endblock title %}
-
 
 {% block content %}
 
+<style>
+  .comment {
+      border: 1px solid #eee;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+  }
 
-<section>
-    <div class="container my-5 py-5 text-body">
-      <div class="row d-flex justify-content-center">
-        {% for comment in comments %}
-        <div class="col-md-11 col-lg-9 col-xl-7">
-          <div class="d-flex flex-start mb-4">
-            <img class="rounded-circle shadow-1-strong me-3"
-              src="{{comment.user.profile.picture.url}}" alt="avatar" width="65"
-              height="65" />
-            <div class="card w-100">
-              <div class="card-body p-4">
-                <div class="">
-                  <h5>{{comment.user.full_name}}{% if request.user == comment.user %} <i class="fas fa-check"></i> {% endif %}</h5>
-                  <p class="small">{{comment.created|uzbek_timesince}}</p>
-                  <p>
-                    {{comment.body}}
-                  </p>
-  
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                      {% comment %} <a href="#!" class="link-muted me-2"><i class="fas fa-thumbs-up me-1"></i>132</a>
-                      <a href="#!" class="link-muted"><i class="fas fa-thumbs-down me-1"></i>15</a> {% endcomment %}
+  .comment-header {
+      margin-bottom: 10px;
+  }
+
+  .comment-user {
+      font-weight: bold;
+      margin-right: 10px;
+  }
+
+  .comment-date {
+      color: #2e2d2d;
+  }
+
+  .comment-text {
+      margin-bottom: 10px;
+  }
+
+  .comment-actions .btn {
+      margin-right: 10px;
+  }
+</style>
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h3 class="text-center mb-4">Mijozlardan sharhlar</h3>
+            <div class="comments-list">
+                {% for comment in comments %}
+                {% if not comment.reply_to %}
+                <div class="comment" id="comment-{{ comment.id }}">
+                    <div class="comment-header d-flex justify-content-between align-items-center mb-2">
+                        <div class="user-info">
+                            <img src="{{ comment.user.profile.picture.url }}" class="rounded-circle me-2" alt="User Avatar" width="50" height="50">
+                            <span class="comment-user">{{ comment.user.profile.first_name }}</span>
+                            <span class="comment-date">{{ comment.created|date:"h:i d-m-Y" }}</span>
+                        </div>
+                        {% if request.user == comment.user %}
+                        <button class="btn btn-danger btn-sm delete-comment" data-comment-id="{{ comment.id }}">Delete</button>
+                        {% endif %}
                     </div>
-                    <button class="btn"><i class="fas fa-trash text-danger"></i></button>
-                    {% if request.user != comment.user %}
-                    <button class="btn" class="link-muted reply-btn" data-toggle="modal"
-                    data-target="#replyModal" data-comment-id="{{ comment.id }}" onclick="setCommentId({{comment.id}})"><i class="fas fa-reply me-1"></i> Javob yozish</button>
-                    {% endif %}
-                  </div>
+                    <p class="comment-text text-black">{{ comment.body }}</p>
+                    <button class="btn reply-btn" data-toggle="modal" data-target="#replyModal" data-comment-id="{{ comment.id }}" onclick="setCommentId({{ comment.id }})">
+                      <i class="fas fa-reply me-1"></i> Javob yozish
+                  </button>
+                    <!-- Replies -->
+                    {% include 'kitchen/comment_replies.html' with comment=comment %}
                 </div>
-              </div>
+                {% endif %}
+                {% empty %}
+                <div class="col-md-11 col-lg-9 col-xl-7">
+                    <div class="card w-100">
+                        <div class="card-body p-4">
+                            <h5 class="text-center">Hozircha hech qanday sharhlar yo'q</h5>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-          </div>
         </div>
-        {% endfor %}  
-      </div>
     </div>
-  </section>
+</div>
 
 
-  <!-- Reply Modal -->
+
+<!-- Reply Modal -->
 <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -77,9 +106,37 @@ Sharhlar
     </div>
 </div>
 
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Sharhni o'chirish</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="comment_id" id="deleteCommentId">
+                    <p>Haqiqatdan ham bu sharhni o'chirmoqchimisiz?</p>
+                    <input type="hidden" name="action" id="" value="delete">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Yopish</button>
+                    <button type="submit" class="btn btn-danger">O'chirish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     function setCommentId(commentId){
-        document.getElementById('replyCommentId').value = commentId
+        document.getElementById('replyCommentId').value = commentId;
+    }
+
+    function setDeleteCommentId(commentId) {
+        document.getElementById('deleteCommentId').value = commentId;
     }
 </script>
 

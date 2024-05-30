@@ -1,0 +1,37 @@
+{% load uzbek_timesince %}
+
+{% for reply in comment.reviewkitchen_set.all %}
+<div class="d-flex flex-start mt-4">
+    <img class="rounded-circle shadow-1-strong me-3"
+         src="{{reply.user.profile.picture.url}}" alt="avatar" width="50" height="50" />
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <div class="">
+                <h6>{{reply.user.profile.first_name}}{% if request.user.is_kitchen %} <i class="fas fa-check-circle"></i> | {{request.user.kitchen.title}} {% endif %}</h6>
+                <p class="small">{{reply.created|date:"h:i d-m-Y"}}</p>
+                <p>{{reply.body}}</p>
+                
+                <!-- Recursively include replies to this reply -->
+                {% include 'kitchen/comment_replies.html' with comment=reply %}
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      {% comment %} <a href="#!" class="link-muted me-2"><i class="fas fa-thumbs-up me-1"></i>132</a>
+                      <a href="#!" class="link-muted"><i class="fas fa-thumbs-down me-1"></i>15</a> {% endcomment %}
+                    </div>
+                    {% if request.user == reply.user %}
+                    <button class="btn" data-toggle="modal" data-target="#deleteModal" data-comment-id="{{ reply.id }}" onclick="setDeleteCommentId({{ reply.id }})">
+                        <i class="fas fa-trash text-danger"></i>
+                    </button>
+                    {% endif %}
+                    {% if request.user != reply.user %}
+                    <button class="btn reply-btn" data-toggle="modal" data-target="#replyModal" data-comment-id="{{ reply.id }}" onclick="setCommentId({{ reply.id }})">
+                        <i class="fas fa-reply me-1"></i> Javob yozish
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
