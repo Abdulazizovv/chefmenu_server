@@ -19,11 +19,19 @@ def cart(request, kitchen_id):
     if table_number and kitchen.get_orders:
         get_orders = True
         table = get_object_or_404(Table, table_unique_id=table_number)
+    
+    # Convert kitchen service fee amount to float if it exists
+    if kitchen.service_fee_text == '%':
+        service_fee_amount = (kitchen.service_fee_amount * cart.get_total_products_price()) // 100
+    else:
+        service_fee_amount = kitchen.service_fee_amount
+
     context = {
         'cart': cart,
         'kitchen': kitchen,
         'table': table,
         'get_orders': get_orders,
+        'service_fee_amount': service_fee_amount,
     }
     return render(request, 'cart/cart.html', context=context)
 

@@ -52,7 +52,7 @@ Sharhlar
                             <span class="comment-date">{{ comment.created|date:"h:i d-m-Y" }}</span>
                         </div>
                         {% if request.user == comment.user %}
-                        <button class="btn btn-danger btn-sm delete-comment" data-comment-id="{{ comment.id }}">Delete</button>
+                        <button class="btn btn-danger btn-sm delete-comment" data-toggle="modal" data-target="#deleteModal" data-comment-id="{{ comment.id }}" onclick="setDeleteCommentId({{ comment.id }})">Delete</button>
                         {% endif %}
                     </div>
                     <p class="comment-text text-black">{{ comment.body }}</p>

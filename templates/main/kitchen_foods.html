@@ -56,10 +56,15 @@ Menu
     transition: all 0.3s ease;
   }
 
+  .card-img-top {
+    height: 200px; /* Set a fixed height for the card images */
+    object-fit: cover; /* Ensure the images cover the entire space */
+  }
   .card-image img {
     max-width: 100%;
-    height: auto;
     border-radius: 8px 0 0 8px;
+    height: 200px;
+    object-fit: cover;
   }
 
   .card-details {
@@ -109,22 +114,27 @@ Menu
     color: #333;
   }
 
+  .m-100 {
+    margin-bottom: 100px;
+  }
+
   
 </style>
 
 <nav class="container mb-3 sticky-nav">
   <ul id="category-nav" class="nav nav-pills justify-content-center">
     {% for category in categories %}
-    {% if category.food.all %}
-    <li class="nav-item">
-      <a href="#{{category.slug}}" class="nav-link {% if forloop.first %}active{% endif %}">{{category.title}}</a>
-    </li>
-    {% endif %}
+      {% if category.food.all %}
+        <li class="nav-item">
+          <a href="#{{category.slug}}" class="nav-link {% if forloop.first %}active{% endif %}" onclick="scrollToSection('{{category.slug}}')">{{category.title}}</a>
+        </li>
+      {% endif %}
     {% endfor %}
   </ul>
 </nav>
 
-<main class="container pb-5">
+
+<main class="container pb-5 m-00">
   {% for category in categories %}
   {% if category.food.all %}
   <section id="{{category.slug}}" class="category-section">
@@ -259,6 +269,39 @@ Menu
     var priceFormatted = formatPrice(priceText);
     $(this).text(priceFormatted);
   });
+
+  function scrollToSection(sectionId) {
+    var section = document.getElementById(sectionId);
+    window.scrollTo({
+      top: section.offsetTop - 100, // Adjust the offset if needed
+      behavior: 'smooth'
+    });
+  }
+
+  window.addEventListener('scroll', function() {
+    var scrollPosition = window.scrollY;
+    var sections = document.querySelectorAll('section.category-section');
+    
+    sections.forEach(function(section) {
+      var top = section.offsetTop;
+      var bottom = top + section.offsetHeight;
+
+      if (scrollPosition >= top && scrollPosition < bottom) {
+        var sectionId = section.getAttribute('id');
+        setActiveNavigation(sectionId);
+      }
+    });
+  });
+
+  function setActiveNavigation(sectionId) {
+    var navItems = document.querySelectorAll('#category-nav .nav-link');
+    navItems.forEach(function(item) {
+      item.classList.remove('active');
+      if (item.getAttribute('href').slice(1) === sectionId) {
+        item.classList.add('active');
+      }
+    });
+  }
 </script>
 
 {% endblock content %}

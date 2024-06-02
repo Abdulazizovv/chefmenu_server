@@ -51,7 +51,7 @@ class Food(models.Model):
     name = models.CharField(max_length=255)
     price = models.PositiveIntegerField(default=0)
     description = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to='food/')
+    image = models.ImageField(upload_to='food/', default='default-food-image.jpg')
     rate = models.FloatField(default=0.0)
     is_active = models.BooleanField(default=True)
     has_variants = models.BooleanField(default=False)

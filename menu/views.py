@@ -146,17 +146,6 @@ def add_food(request):
         variant_images = request.FILES.getlist('variantImages[]')
 
         category = get_object_or_404(FoodCategory, id=food_category)
-
-        # Validate food image
-        if not food_image:
-            messages.error(request, "Food image is required")
-            return redirect('menu:category_foods', title=category.slug)
-        validator = FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
-        try:
-            validator(food_image)
-        except ValidationError as e:
-            messages.error(request, "Invalid food image format. Only JPG, JPEG, and PNG are allowed.")
-            return redirect('menu:category_foods', title=category.slug)
         
         # Save food data to the database
         food = Food.objects.create(
@@ -165,8 +154,24 @@ def add_food(request):
             name=food_name,
             description=food_description,
             price=food_price,
-            image=food_image
         )
+
+        # Validate food image
+        # if not food_image:
+        #     messages.error(request, "Food image is required")
+        #     return redirect('menu:category_foods', title=category.slug)
+
+        if food_image:
+            validator = FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+            try:
+                validator(food_image)
+            except ValidationError as e:
+                messages.error(request, "Invalid food image format. Only JPG, JPEG, and PNG are allowed.")
+                return redirect('menu:category_foods', title=category.slug)
+            food.image = food_image
+            food.save()
+        
+        
 
         # if redirect_url:
         #     return redirect(redirect_url, food.id)

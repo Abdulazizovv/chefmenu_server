@@ -7,7 +7,6 @@
     {% comment %} <script src="https://kit.fontawesome.com/b67c8e9692.js" crossorigin="anonymous"></script> {% endcomment %}
     <link rel="stylesheet" href="{% static "kitchen/vendor/fontawesome-free/css/all.min.css" %}">
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700,900&display=swap" rel="stylesheet">
-
     {% include "main/links.html" %}
     <title>{% block title %}{% endblock title %}</title>
     {% block head %}{% endblock head %}
@@ -18,6 +17,7 @@
     /* Customize styles here */
     body {
         background-color: #f8f9fa;
+        font-family: 'Poppins', sans-serif;
     }
     .navbar {
         background-color: #ffffff;
@@ -37,23 +37,26 @@
         border-color: #ff8474;
     }
     .bottom-navbar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #ffffff;
-        box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
-        z-index: 1030; /* Adjust to overlay other content */
-    }
-    .bottom-navbar .nav-link {
-        padding: 10px;
-        color: #333;
-        text-align: center;
-        flex-grow: 1;
-    }
-    .navbar-icon {
-        font-size: 1.5rem;
-    }
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1030; /* Adjust to overlay other content */
+}
+
+.bottom-navbar .nav-link {
+    padding: 10px;
+    color: #333;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.navbar-icon {
+    font-size: 1.5rem;
+}
+    
 
     .alert {
 		position: relative;

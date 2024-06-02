@@ -1,62 +1,239 @@
 {% extends "main/base.html" %}
-
+{% load uzbek_timesince %}
 {% block title %}
 Sharhlar
 {% endblock title %}
 
 {% block content %}
-<section style="background-color: #f8f9fa; padding-bottom: 60px;">
-    <div class="container my-5 py-5 mb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-10">
+
+<style>
+    /* Existing styles */
+    
+    .comment {
+        border: 1px solid #c77272;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        margin-bottom: 500px;
+    }
+
+    .comment-header {
+        margin-bottom: 10px;
+    }
+
+    .comment-user {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .comment-date {
+        color: #2e2d2d;
+    }
+
+    .comment-text {
+        margin-bottom: 10px;
+    }
+
+    .comment-actions .btn {
+        margin-right: 10px;
+    }
+
+    .post-comment-container {
+    position: fixed; /* Change to fixed to keep it always at the bottom */
+    background-color: #fff;
+    padding: 10px;
+    border-top: 1px solid #e9ecef;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1030;
+}
+
+    .post-comment-container textarea {
+        resize: none;
+    }
+
+    .post-comment-container img {
+        border-radius: 50%;
+    }
+
+    .post-comment-container .btn {
+        margin-left: 10px;
+    }
+
+    .no-comments {
+        margin-bottom: 600px; /* Ensure space for the sticky footer */
+    }
+
+    .kitchen-info {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #dfcdde;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .kitchen-info img {
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .kitchen-info h4 {
+        margin: 0;
+    }
+
+    /* New style for comment section */
+    .comments-list {
+        max-height: 600px; /* Adjust height as needed */
+        overflow-y: auto; /* Enable vertical scroll if needed */
+    }
+
+    .comment:not(:last-child) {
+        margin-bottom: 15px; /* Reduce margin between comments */
+    }
+</style>
+
+
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+
+            <!-- Kitchen Info -->
+            <div class="kitchen-info">
+                <img src="{{ kitchen.image.url }}" alt="Kitchen Image" width="50" height="50">
+                <h4>{{ kitchen.title }}</h4>
+            </div>
+            <!-- End Kitchen Info -->
+
+            <h3 class="text-center mb-4">Sharhlar <i class="fas fa-comments"></i></h3>
+            <div class="comments-list">
                 {% for comment in comments %}
-                <!-- Comment card starts here -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <img class="rounded-circle me-3" src="{{ comment.user.profile.picture.url }}"
-                                alt="avatar" width="50" height="50">
+                {% if not comment.reply_to %}
+                <div class="comment" id="comment-{{ comment.id }}">
+                    <div class="comment-header d-flex justify-content-between align-items-center mb-2">
+                        <div class="user-info d-flex align-items-center">
+                            <img src="{{ comment.user.profile.picture.url }}" class="rounded-circle me-2" alt="User Avatar" width="50" height="50">
                             <div>
-                                <h6 class="fw-bold text-primary mb-0">{{ comment.user.full_name }}</h6>
-                                <p class="text-muted small mb-0">{{ comment.updated }}</p>
+                                <span class="comment-user">{{ comment.user.profile.first_name }}</span>
+                                <span class="comment-date">{{ comment.created|date:"H:i d-m-Y" }}</span>
                             </div>
                         </div>
-                        <p class="mt-3 mb-4">{{ comment.body }}</p>
+                        {% if request.user == comment.user %}
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-comment-id="{{ comment.id }}" onclick="setDeleteCommentId({{ comment.id }})"><i class="fas fa-trash"></i></button>
+                        {% endif %}
+                    </div>
+                    <p class="comment-text text-black">{{ comment.body }}</p>
+                    <button class="btn btn-primary btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#replyModal" data-comment-id="{{ comment.id }}" onclick="setCommentId({{ comment.id }})">
+                      <i class="fas fa-reply me-1"></i> Javob yozish
+                  </button>
+                    <!-- Replies -->
+                    {% include 'main/reply_comments.html' with comment=comment %}
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="no-comments">
+                    <div class="col-md-11 col-lg-9 col-xl-7">
+                        <div class="card w-100">
+                            <div class="card-body p-4">
+                                <h5 class="text-center">Hozircha hech qanday sharhlar yo'q. Birinchilardan bo'lib fikr bildiring</h5>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- Comment card ends here -->
                 {% endfor %}
             </div>
+
+            {% if request.user.is_authenticated %}
+            <!-- Post comment section -->
+            <div class="post-comment-container mt-4">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="d-flex align-items-center">
+                        <img class="rounded-circle me-3" src="{{ request.user.profile.picture.url }}" alt="avatar" width="50" height="50">
+                        <div class="form-floating flex-grow-1">
+                            <textarea class="form-control" id="postComment" placeholder="Sharh qoldiring..." name="post_body" style="height: 70px;" required></textarea>
+                            <label for="postComment">Sharh qoldiring...</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary ms-3">Yuborish</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Post comment section ends here -->
+            {% else %}
+            <!-- Login prompt -->
+            <div class="container py-1 text-center">
+                <h2 class="mb-4">Sharh qoldirish uchun avval hisobga kiring</h2>
+                <a href="{% url 'main:login' %}" class="btn btn-primary">Kirish</a>
+            </div>
+            <!-- Post comment section ends here -->
+            {% endif %}
         </div>
     </div>
-</section>
+</div>
 
-{% if request.user.is_authenticated %}
-<!-- Post comment section -->
-<div class="fixed-bottom bg-light py-4 mt-5" style="width: 90%; z-index: 100;">
-    <div class="container">
-        <form action="" method="post">
-            {% csrf_token %}
-            <div class="d-flex align-items-center">
-                <img class="rounded-circle me-3" src="{{ request.user.profile.picture.url }}" alt="avatar"
-                    width="50" height="50">
-                <div class="form-floating w-100">
-                    <textarea class="form-control" id="postComment" rows="5" placeholder="Sharh qoldiring..."
-                        name="post_body"></textarea>
-                    <label for="postComment">Sharh qoldiring...</label>
-                </div>
-                <button type="submit" class="btn btn-primary ms-3">Post comment</button>
+<!-- Reply Modal -->
+<div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="replyModalLabel">Sharhga javob yozish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </form>
+            <form id="replyForm" method="post" action="{% url "review:manage_comment" %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="comment_id" id="replyCommentId">
+                    <input type="hidden" name="action" value="reply">
+                    <div class="form-group">
+                        <label for="replyBody">Matn:</label>
+                        <textarea class="form-control" id="replyBody" name="replyText" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+                    <button type="submit" class="btn btn-primary">Yuborish</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-<!-- Post comment section ends here -->
-{% else %}
-<!-- Login prompt -->
-<div class="container py-1 text-center">
-    <h2 class="mb-4">Sharh qoldirish uchun avval hisobga kiring</h2>
-    <a href="{% url 'main:login' %}" class="btn btn-primary">Kirish</a>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Sharhni o'chirish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteForm" method="post" action="{% url "review:manage_comment" %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="comment_id" id="deleteCommentId">
+                    <p>Haqiqatdan ham bu sharhni o'chirmoqchimisiz?</p>
+                    <input type="hidden" name="action" value="delete">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+                    <button type="submit" class="btn btn-danger">O'chirish</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-<!-- Post comment section ends here -->
-{% endif %}
+
+<script>
+    function setCommentId(commentId) {
+        document.getElementById('replyCommentId').value = commentId;
+    }
+
+    function setDeleteCommentId(commentId) {
+        document.getElementById('deleteCommentId').value = commentId;
+    }
+</script>
+
 {% endblock content %}

@@ -57,6 +57,8 @@ class Kitchen(models.Model):
     title = models.CharField(max_length=255)
     info = models.TextField(null=True, blank=True)
     address = models.CharField(max_length=255, default="", null=True, blank=True)
+    service_fee_text = models.CharField(max_length=255, null=True, blank=True)
+    service_fee_amount = models.PositiveIntegerField(default=0)
     rate = models.FloatField(default=0.0)
     slug = models.SlugField(unique=True, unique_for_date='created', max_length=500)
     created = models.DateTimeField(auto_now_add=True)
