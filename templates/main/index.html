@@ -221,7 +221,7 @@ Bosh sahifa
                         <img src="{% if kitchen.image %}{{kitchen.image.url}}{% else %}https://via.placeholder.com/150{% endif %}" class="img-fluid restaurant-img" alt="...">
                         <div>
                             <h5 class="card-title">{{kitchen.title}}</h5>
-                            <p class="card-text">{{kitchen.info}}</p>
+                            {% comment %} <p class="card-text">{{kitchen.info}}</p> {% endcomment %}
                         </div>
                     </div>
                 </div>
