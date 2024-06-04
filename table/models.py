@@ -37,7 +37,7 @@ class Table(models.Model):
         ('occupied', 'Band'),
         ('reserved', 'Zaxira'),
     )
-
+    name = models.CharField(max_length=255, null=True, blank=True)
     kitchen = models.ForeignKey(Kitchen, on_delete=models.CASCADE, related_name='tables')
     table_unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     number = models.IntegerField()
@@ -58,4 +58,7 @@ class Table(models.Model):
                 # If there are no tables in the database, start with table number 1
                 self.number = 1
         self.generate_qr_code()
+        if not self.name:
+            self.name = self.number
         super(Table, self).save(*args, **kwargs)
+        

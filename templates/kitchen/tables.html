@@ -69,6 +69,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">Stol raqami</th>
+                        <th scope="col">Stol nomi</th>
                         <th scope="col">Status</th>
                         <th scope="col">Harakat</th>
                         <th></th>
@@ -78,6 +79,7 @@
                     {% for table in tables %}
                     <tr>
                         <td>{{table.number}}</td>
+                        <td>{{table.name}}</td>
                         <td>
                             {% if table.status == 'available' %}
                             <span class="badge bg-success">Bo'sh</span>

@@ -75,8 +75,11 @@ def edit_table(request):
     if request.method == "POST":
         table_id = request.POST.get('table-id')
         table_status = request.POST.get('table-status')
+        table_name = request.POST.get('table_name')
         table = request.user.kitchen.tables.get(id=table_id)
         table.status = table_status
+        if table_name:
+            table.name = table_name
         table.save()
         messages.success(request, 'Table updated successfully')
         return redirect('table:index')
