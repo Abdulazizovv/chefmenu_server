@@ -1,11 +1,8 @@
 from django.db import models
-from django.utils import timezone
-from datetime import timedelta
+from django.utils.text import slugify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from users.models import Kitchen
-from django.utils.text import slugify
-import uuid
 
 
 class VerificationCode(models.Model):
@@ -28,10 +25,10 @@ class FoodCategory(models.Model):
     kitchen = models.ForeignKey(Kitchen, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=500)
-    
-    def __str__(self) -> str:
+
+    def __str__(self):
         return self.title
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.title)
@@ -44,7 +41,6 @@ class FoodCategory(models.Model):
         super().save(*args, **kwargs)
 
 
-
 class Food(models.Model):
     category = models.ForeignKey(FoodCategory, on_delete=models.SET_NULL, related_name="food", null=True)
     kitchen = models.ForeignKey(Kitchen, on_delete=models.CASCADE, related_name='foods')
@@ -55,16 +51,15 @@ class Food(models.Model):
     rate = models.FloatField(default=0.0)
     is_active = models.BooleanField(default=True)
     has_variants = models.BooleanField(default=False)
-
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ('-created', )
     
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
-    
+
 
 class FoodVariant(models.Model):
     food = models.ForeignKey(Food, on_delete=models.CASCADE, related_name='variants')
@@ -87,14 +82,12 @@ class Menu(models.Model):
 
     def __str__(self):
         return self.name
-    
 
 
 class Payment(models.Model):
     kitchen = models.ForeignKey(Kitchen, on_delete=models.SET_NULL, null=True)
     amount = models.PositiveBigIntegerField(default=0)
     is_accepted = models.BooleanField(default=False)
-
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -102,9 +95,9 @@ class Payment(models.Model):
         verbose_name_plural = 'To`lovlar'
         ordering = ['created']
     
-    def __str__(self) -> str:
-        return str(f'{self.kitchen.title} - {self.amount} sum')
-    
+    def __str__(self):
+        return f'{self.kitchen.title} - {self.amount} sum' if self.kitchen else f'{self.amount} sum'
+
 
 class ContactMessages(models.Model):
     name = models.CharField(max_length=255)
@@ -119,14 +112,11 @@ class ContactMessages(models.Model):
         verbose_name_plural = 'Xabarlar'
         ordering = ['-created']
     
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
-
-
 
 
 @receiver(post_save, sender=Kitchen)
 def create_kitchen_menu(sender, instance, created, **kwargs):
     if created:
         Menu.objects.create(kitchen=instance, name=f"{instance.title}'s Menu")
-    

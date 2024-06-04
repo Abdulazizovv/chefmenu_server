@@ -28,7 +28,7 @@ Buyurtmalar
                 
                 <div class="card-body">
                     <h5 class="card-title">
-                        Stol: {{ order.table.number }} <br>
+                        Stol: <b>{% if order.table %}{% if order.table.name %}{{order.table.name}}{% else %}{{ order.table.number }}{% endif %}{% else %}tanlanmagan{% endif %}</b> <br>
                         Buyurtma Holati: 
                         {% if order.status == "new" %}
                         <span class="badge badge-pill badge-success">Yangi</span>
@@ -114,7 +114,7 @@ Buyurtmalar
                         <select class="form-control" id="table" name="table" required>
                             <option value="" selected disabled>Stolni tanlang</option>
                             {% for table in tables %}
-                            <option value="{{ table.table_unique_id }}">{{ table.number }}</option>
+                            <option value="{{ table.table_unique_id }}">{% if table.name %}{{table.name}}{% else %}{{ table.number }}{% endif %}</option>
                             {% endfor %}
                         </select>
                         <button class="btn btn-primary mt-3 mb-3" type="submit">Keyingisi <i class="fas fa-arrow-right"></i></button>

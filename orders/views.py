@@ -35,7 +35,7 @@ def index(request):
         request.session['is_kitchen_admin'] = True
         return redirect('main:foods', slug=request.user.kitchen.slug)
     kitchen = request.user.kitchen
-    tables = Table.objects.filter(kitchen=kitchen)
+    tables = Table.objects.filter(kitchen=kitchen).order_by('number')
     orders = Orders.objects.filter(kitchen=kitchen, status__in=["in_progress", "new"]).order_by('-created')
     context = {
         'orders': orders,

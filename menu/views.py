@@ -13,14 +13,12 @@ from django.core.validators import FileExtensionValidator
 @only_kitchen
 def kitchen_menu(request):
     if request.method == 'POST':
-        category_name = request.POST.get('category_name' or None)
+        # Handle adding a new category
+        category_name = request.POST.get('category_name', None)
         if category_name:
             user = get_object_or_404(User, id=request.user.id)
             kitchen = user.kitchen
-            category = FoodCategory.objects.create(
-                title=category_name,
-                kitchen=kitchen
-            )
+            category = FoodCategory.objects.create(title=category_name, kitchen=kitchen)
             category.save()
         return redirect('menu:kitchen_menu')
     else:
@@ -29,9 +27,7 @@ def kitchen_menu(request):
         categories = FoodCategory.objects.filter(kitchen=kitchen)
         menu = get_object_or_404(Menu, kitchen=kitchen)
         foods = menu.foods.values()
-        category_counts = {}
-        for category in categories:
-            category_counts[category] = Food.objects.filter(category=category).count()
+        category_counts = {category: Food.objects.filter(category=category).count() for category in categories}
         context = {
             'menu': menu,
             'foods': foods,
@@ -50,10 +46,7 @@ def all_foods(request):
         kitchen = user.kitchen
         categories = FoodCategory.objects.filter(kitchen=kitchen)
         foods = Food.objects.filter(kitchen=kitchen)
-        context = {
-            'foods': foods,
-            'categories': categories,
-        }
+        context = {'foods': foods, 'categories': categories}
         return render(request, 'kitchen/all-foods.html', context=context)
 
 
@@ -63,57 +56,50 @@ def food_detail(request, id):
         user = get_object_or_404(User, id=request.user.id)
         kitchen = user.kitchen
         food = get_object_or_404(Food, id=id)
-        context = {
-            'food': food
-        }
+        context = {'food': food}
         return render(request, 'kitchen/food_detail.html', context=context)
 
 
 @only_kitchen
 def delete_category(request):
     if request.method == 'POST':
-        print(request.POST)
-        id = request.POST.get('category_id')
-        category = get_object_or_404(FoodCategory, id=id)
+        category_id = request.POST.get('category_id')
+        category = get_object_or_404(FoodCategory, id=category_id)
         if category.kitchen == request.user.kitchen:
-            messages.success(request, "Kategoriya o'chirildi!")
             category.delete()
-            return redirect('menu:kitchen_menu')
+            messages.success(request, "Category deleted successfully!")
         else:
-            messages.error(request, "Sizga ruxsat yo'q!")
-            return redirect('menu:kitchen_menu')
-    messages.warning(request, "GET so'rovni qo'llab-quvvatlamaymiz!")
+            messages.error(request, "Permission denied!")
+    else:
+        messages.warning(request, "GET method not allowed!")
     return redirect('menu:kitchen_menu')
 
 
 @only_kitchen
 def edit_category(request):
     if request.method == 'POST':
-        id = request.POST.get('category_id')
-        title = request.POST.get('category_name')
-        category = get_object_or_404(FoodCategory, id=id)
+        category_id = request.POST.get('category_id')
+        category_name = request.POST.get('category_name')
+        category = get_object_or_404(FoodCategory, id=category_id)
         if category.kitchen == request.user.kitchen:
-            category.title = title
+            category.title = category_name
             category.save()
-            messages.success(request, "Kategoriya o'zgartirildi!")
-            return redirect('menu:kitchen_menu')
+            messages.success(request, "Category updated successfully!")
         else:
-            messages.error(request, "Sizga ruxsat yo'q!")
-            return redirect('menu:kitchen_menu')
-    messages.warning(request, "GET so'rovni qo'llab-quvvatlamaymiz!")
+            messages.error(request, "Permission denied!")
+    else:
+        messages.warning(request, "GET method not allowed!")
     return redirect('menu:kitchen_menu')
 
 
 @only_kitchen
 def category_foods(request, title):
-        category = get_object_or_404(FoodCategory, slug=title)
-        foods = Food.objects.filter(category=category).order_by('name').prefetch_related('variants')
-        context = {
-            'category': category,
-            'foods': foods
-        }
-        return render(request, 'kitchen/category_foods.html', context=context)
+    category = get_object_or_404(FoodCategory, slug=title)
+    foods = Food.objects.filter(category=category).order_by('name').prefetch_related('variants')
+    context = {'category': category, 'foods': foods}
+    return render(request, 'kitchen/category_foods.html', context=context)
 
+# Other views remain unchanged for now.
 
 
 @only_kitchen
@@ -127,7 +113,6 @@ def edit_food(request, food_id):
         "categories": categories,
     }
     return render(request, "kitchen/edit-food.html", context=context)
-
 
 
 @only_kitchen

@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
-import json
 from cart.cart import Cart
 from main.models import Food
 from table.models import Table
@@ -9,22 +8,19 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 def cart(request, kitchen_id):
-    table = None
-    table_number = request.session.get('table_id' or None)
+    table_number = request.session.get('table_id')
     cart = Cart(request)
-    kitchen = get_object_or_404(Kitchen, id=int(kitchen_id))
+    kitchen = get_object_or_404(Kitchen, id=kitchen_id)
+    table = None
     get_orders = False
-    print(kitchen.get_orders)
-    print(table_number)
+
     if table_number and kitchen.get_orders:
         get_orders = True
         table = get_object_or_404(Table, table_unique_id=table_number)
     
-    # Convert kitchen service fee amount to float if it exists
+    service_fee_amount = kitchen.service_fee_amount
     if kitchen.service_fee_text == '%':
-        service_fee_amount = (kitchen.service_fee_amount * cart.get_total_products_price()) // 100
-    else:
-        service_fee_amount = kitchen.service_fee_amount
+        service_fee_amount = (service_fee_amount * cart.get_total_products_price()) // 100
 
     context = {
         'cart': cart,
@@ -36,82 +32,69 @@ def cart(request, kitchen_id):
     return render(request, 'cart/cart.html', context=context)
 
 
-
 @api_view(['POST'])
 def add_cart(request):
-    cart = Cart(request)
-    response = {'status': 'error', 'cart': cart}  # Add 'cart' key to the response dictionary
     if request.method == 'POST':
         data = request.data
-        product_id = data['product_id']
-        kitchen_id = data['kitchen_id']
-        # print(data)
-        # print(kitchen_id)
-        product = Food.objects.get(id=product_id)
+        product = get_object_or_404(Food, id=data['product_id'])
+        cart = Cart(request)
         cart.add(product=product)
         response = {
             'status': 'success',
             'cart': cart,
-            'total_price': cart.get_total_price(),  # Add 'total_price' key to the response dictionary
-            'total_quantity': cart.get_total_quantity(),  # Add 'total_quantity' key to the response dictionary
+            'total_price': cart.get_total_price(),
+            'total_quantity': cart.get_total_quantity(),
         }
-    return Response(response)
+        return Response(response)
+    return Response({'status': 'error'}, status=400)
+
 
 @api_view(['POST'])
 def remove_cart(request):
-    cart = Cart(request)
-    response = {'status': 'error', 'cart': cart}  # Add 'cart' key to the response dictionary
     if request.method == 'POST':
         data = request.data
-        product_id = data['product_id']
-        kitchen_id = data['kitchen_id']
-        product = Food.objects.get(id=product_id)
+        product = get_object_or_404(Food, id=data['product_id'])
+        cart = Cart(request)
         cart.remove(product=product)
         response = {
             'status': 'success',
             'cart': cart,
-            'total_price': cart.get_total_price(),  # Add 'total_price' key to the response dictionary
-            'total_quantity': cart.get_total_quantity(),  # Add 'total_quantity' key to the response dictionary
-
+            'total_price': cart.get_total_price(),
+            'total_quantity': cart.get_total_quantity(),
         }
-    return Response(response)
+        return Response(response)
+    return Response({'status': 'error'}, status=400)
 
 
 @api_view(['POST'])
 def decrement_cart(request):
-    cart = Cart(request)
-    response = {'status': 'error', 'cart': cart}  # Add 'cart' key to the response dictionary
     if request.method == 'POST':
         data = request.data
-        product_id = data['product_id']
-        kitchen_id = data['kitchen_id']
-        print(kitchen_id)
-        product = Food.objects.get(id=product_id)
+        product = get_object_or_404(Food, id=data['product_id'])
+        cart = Cart(request)
         cart.decrement(product=product)
         response = {
             'status': 'success',
             'cart': cart,
-            'total_price': cart.get_total_price(),  # Add 'total_price' key to the response dictionary
+            'total_price': cart.get_total_price(),
             'total_quantity': cart.get_total_quantity(),
         }
-    return Response(response)
+        return Response(response)
+    return Response({'status': 'error'}, status=400)
 
 
 @api_view(['POST'])
 def clear_cart(request):
-    cart = Cart(request)
-    response = {'status': 'error', 'cart': cart}  # Add 'cart' key to the response dictionary
     if request.method == 'POST':
-        data = request.data
-        kitchen_id = data['kitchen_id']
-        print(kitchen_id)
+        cart = Cart(request)
         cart.clear()
         response = {
             'status': 'success',
             'cart': cart,
-            'total_price': cart.get_total_price()  # Add 'total_price' key to the response dictionary
+            'total_price': cart.get_total_price(),
         }
-    return Response(response)
+        return Response(response)
+    return Response({'status': 'error'}, status=400)
 
 
 def cart_detail(request):
@@ -124,4 +107,3 @@ def checkout(request):
 
 def order_create(request):
     return render(request, 'cart/order_create.html')
-
