@@ -76,7 +76,7 @@ Buyurtmalar tarixi
                         <tr>
                             <td>{{order.id}}</td>
                             <td><i class="fas fa-calendar-week"></i> {{order.created|date:"d-m-Y"}} | <i class="fas fa-clock"></i> {{order.created|date:"H:i"}}</td>
-                            <td>{{order.table.number}}</td>
+                            <td>{% if order.table.name %}{{order.table.name}}{% else %}{{order.table.number}}{% endif %}</td>
                             <td>{{order.total_price}}</td>
                             <td>
                                 {% if order.status == 'new' %}

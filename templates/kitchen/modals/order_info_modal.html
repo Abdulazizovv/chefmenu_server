@@ -11,7 +11,7 @@
 
 
 
-                <h4 class="mt-5 theme-color mb-5">Stol raqami: #{{order.table.number}}</h4>
+                <h4 class="mt-5 theme-color mb-5">Stol: {% if order.table.name %}{{order.table.name}}{% else %}#{{order.table.number}}{% endif %}</h4>
                 {% if order.user %}
                 <h6 class="theme-color">buyurtma berdi: {{order.user.full_name}}{% if order.user.is_kitchen and order.user.kitchen.id == order.kitchen.id %} <i class="fas fa-check-circle"></i> {% else %}|mijoz{% endif %}</h6>
                 {% else %}
