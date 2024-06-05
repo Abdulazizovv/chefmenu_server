@@ -229,7 +229,7 @@ Menu
         data: JSON.stringify({ product_id: productId, kitchen_id: kitchenId }),
         success: function(response) {
           console.log('Product quantity updated successfully!', response);
-          if (!response.cart[productId]) {
+          if (response.cart[productId].quantity === 0) {
             $button.parent('.select-section').html("<button class='btn btn-primary add-to-cart' data-product-id='" + productId + "' data-kitchen-id='" + kitchenId + "'>Savatga qo'shish <i class='fas fa-cart-plus'></i></button>");
           } else {
             updateQuantity($button, response.cart[productId].quantity);
@@ -308,11 +308,24 @@ Menu
 
   function setActiveNavigation(sectionId) {
     var navItems = document.querySelectorAll('#category-nav .nav-link');
+    var activeItem = document.querySelector(`#category-nav .nav-link[href='#${sectionId}']`);
+    
     navItems.forEach(function(item) {
       item.classList.remove('active');
-      if (item.getAttribute('href').slice(1) === sectionId) {
-        item.classList.add('active');
-      }
+    });
+
+    if (activeItem) {
+      activeItem.classList.add('active');
+      centerActiveNavLink(activeItem);
+    }
+  }
+
+  function centerActiveNavLink(activeItem) {
+    var navContainer = document.querySelector('#category-nav');
+    var itemOffset = activeItem.offsetLeft - navContainer.offsetWidth / 2 + activeItem.offsetWidth / 2;
+    navContainer.scroll({
+      left: itemOffset,
+      behavior: 'smooth'
     });
   }
 </script>
