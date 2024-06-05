@@ -107,7 +107,7 @@ Savatcha
 <div class="summary-section text-center">
   <hr class="mt-2 mb-4"
     style="height: 0; background-color: transparent; opacity: .75; border-top: 2px dashed #9e9e9e;">
-    <h4>Stol #{{table.number}}</h4>
+    <h4>Stol {% if table.name %}{{table.name}}{% else %}#{{table.number}}{% endif %}</h4>
 
 <div class="d-flex justify-content-between pb-1">
     <p class="small">Xizmat haqi {% if kitchen.service_fee_text %}({% if kitchen.service_fee_text == '%' %}{{ kitchen.service_fee_amount }} %{% else %}{{ kitchen.service_fee_text }}{% endif %}){% endif %}:</p>
