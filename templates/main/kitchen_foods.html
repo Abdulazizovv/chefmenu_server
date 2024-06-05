@@ -135,7 +135,7 @@ Menu
     {% for category in categories %}
       {% if category.food.all %}
         <li class="nav-item">
-          <a href="#{{category.slug}}" class="nav-link {% if forloop.first %}active{% endif %}" onclick="scrollToSection('{{category.slug}}')">{{category.title}}</a>
+          <a href="#{{category.slug}}" class="nav-link {% if forloop.first %}active{% endif %}">{{category.title}}</a>
         </li>
       {% endif %}
     {% endfor %}
@@ -287,7 +287,7 @@ Menu
   window.addEventListener('scroll', function() {
     var scrollPosition = window.scrollY;
     var sections = document.querySelectorAll('section.category-section');
-    
+
     sections.forEach(function(section) {
       var top = section.offsetTop - 100; // Adjust the offset to match the scroll position
       var bottom = top + section.offsetHeight;
@@ -309,7 +309,7 @@ Menu
   function setActiveNavigation(sectionId) {
     var navItems = document.querySelectorAll('#category-nav .nav-link');
     var activeItem = document.querySelector(`#category-nav .nav-link[href='#${sectionId}']`);
-    
+
     navItems.forEach(function(item) {
       item.classList.remove('active');
     });
@@ -328,6 +328,25 @@ Menu
       behavior: 'smooth'
     });
   }
+
+  // Center the first category on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    var firstCategoryLink = document.querySelector('#category-nav .nav-link.active');
+    if (firstCategoryLink) {
+      centerActiveNavLink(firstCategoryLink);
+    }
+
+    // Add click event to nav links
+    var navLinks = document.querySelectorAll('#category-nav .nav-link');
+    navLinks.forEach(function(navLink) {
+      navLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        var targetId = this.getAttribute('href').substring(1);
+        scrollToSection(targetId);
+        setActiveNavigation(targetId);
+      });
+    });
+  });
 </script>
 
 {% endblock content %}
