@@ -232,7 +232,7 @@ def category_foods(request, kitchen_slug, category_slug):
 
 
 def redirect_menu(request, kitchen_id, table_id):
-    kitchen = get_object_or_404(Kitchen, id=kitchen_id)
+    kitchen = get_object_or_404(Kitchen, kitchen_id=kitchen_id)
     request.session['table_id'] = table_id
     request.session['kitchen_id'] = kitchen_id
     return redirect('main:menu', slug=kitchen.slug)

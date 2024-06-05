@@ -105,7 +105,7 @@ def check_food(items, kitchen_id):
 def make_order(request):
     cart = Cart(request)
     table_id = request.session.get('table_id')
-
+    user = request.user
     if request.method == "POST":
         
         kitchen_id = request.POST.get('kitchen_id')
@@ -132,11 +132,19 @@ def make_order(request):
                         )
                         order_items.append(order_item)
 
-                    order = Orders.objects.create(
-                        kitchen=kitchen,
-                        table=table,
-                        total_price=total_price
-                    )
+                    if user.is_authenticated:
+                        order = Orders.objects.create(
+                            kitchen=kitchen,
+                            user=user,
+                            table=table,
+                            total_price=total_price
+                        )
+                    else:
+                        order = Orders.objects.create(
+                                kitchen=kitchen,
+                                table=table,
+                                total_price=total_price
+                            )
                     order.foods.set(order_items)
                     order.save()
                     

@@ -12,7 +12,11 @@
 
 
                 <h4 class="mt-5 theme-color mb-5">Stol raqami: #{{order.table.number}}</h4>
-
+                {% if order.user %}
+                <h6 class="theme-color">buyurtma berdi: {{order.user.full_name}}{% if order.user.is_kitchen and order.user.kitchen.id == order.kitchen.id %} <i class="fas fa-check-circle"></i> {% else %}|mijoz{% endif %}</h6>
+                {% else %}
+                <h6 class="theme-color">buyurtma berdi: Anonim mijoz</h6>
+                {% endif %}
                 <span class="theme-color">Vaqti: {{order.created|date:"H:i"}} | {{order.created|date:"d-m-Y"}} </span>
                 <div class="mb-3">
                     <hr class="new1">
