@@ -27,20 +27,10 @@ Menu
     font-size: 18px;
     font-weight: bold;
     transition: all 0.3s ease;
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: 2px solid transparent;
   }
 
   .nav-link:hover {
-    color: #333;
-    background-color: #f0f0f0;
-  }
-
-  .nav-link.active {
-    background-color: #6f42c1; /* Update this color to match your design */
-    color: #fff;
-    border: 2px solid #6f42c1; /* Update this color to match your design */
+    color: #1f487e;
   }
 
   a {
@@ -70,7 +60,6 @@ Menu
     height: 200px; /* Set a fixed height for the card images */
     object-fit: cover; /* Ensure the images cover the entire space */
   }
-
   .card-image img {
     max-width: 100%;
     border-radius: 8px 0 0 8px;
@@ -128,10 +117,12 @@ Menu
   .m-100 {
     margin-bottom: 100px;
   }
+
+  
 </style>
 
 <nav class="container mb-3 sticky-nav">
-  <ul id="category-nav" class="nav nav-pills justify-content-center flex-nowrap overflow-auto">
+  <ul id="category-nav" class="nav nav-pills justify-content-center">
     {% for category in categories %}
       {% if category.food.all %}
         <li class="nav-item">
@@ -141,6 +132,7 @@ Menu
     {% endfor %}
   </ul>
 </nav>
+
 
 <main class="container pb-5 m-00">
   {% for category in categories %}
@@ -174,6 +166,7 @@ Menu
   {% endfor %}
 </main>
 
+
 <nav class="navbar fixed-bottom bottom-navbar navbar-expand-lg navbar-light bg-light pt-0">
   <div class="container-fluid">
     <a class="nav-link" href="{% url 'main:menu' kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
@@ -188,6 +181,7 @@ Menu
     <a class="nav-link" href="{% url 'review:kitchen' kitchen.id %}"><i class="fas fa-comments navbar-icon"></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
   </div>
 </nav>
+
 
 <script>
   $(document).ready(function() {
@@ -289,7 +283,7 @@ Menu
     var sections = document.querySelectorAll('section.category-section');
 
     sections.forEach(function(section) {
-      var top = section.offsetTop - 100; // Adjust the offset to match the scroll position
+      var top = section.offsetTop;
       var bottom = top + section.offsetHeight;
 
       if (scrollPosition >= top && scrollPosition < bottom) {
@@ -297,13 +291,6 @@ Menu
         setActiveNavigation(sectionId);
       }
     });
-
-    // Check if scrolled to the bottom of the page
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-      var lastSection = sections[sections.length - 1];
-      var lastSectionId = lastSection.getAttribute('id');
-      setActiveNavigation(lastSectionId);
-    }
   });
 
   function setActiveNavigation(sectionId) {
