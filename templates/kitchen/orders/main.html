@@ -37,11 +37,19 @@ Buyurtmalar
                         {% elif order.status == "done" %}
                         <span class="badge badge-pill badge-dark">Yakunlandi</span>
                         {% endif %}
+                        <br>
+                        Buyurtma beruvchi: 
+                        {% if order.user %}{{ order.user.full_name }}{% else %}Anonim{% endif %}
+                        
                     </h5>
                     <p class="card-text">Buyurtma Vaqti: {{ order.created|uzbek_timesince }}</p>
+                    <p class="card-text">Xizmat haqi: {{ order.service_fee }} so'm</p>
+                    Buyurtma berildi:
                     <ul class="list-group list-group-light">
                         {% for item in order.foods.all %}
-                        <li class="list-group-item px-3">{{ item.food.name }} - x{{ item.quantity }}</li>
+                        <li class="list-group-item px-3"><b>{{ item.food.name }}</b>
+                            <p> {{item.price}} x {{ item.quantity }} = {{item.total_price}}</p>
+                        </li>
                         {% endfor %}
                     </ul>
 

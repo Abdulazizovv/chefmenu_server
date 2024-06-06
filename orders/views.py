@@ -117,7 +117,7 @@ def make_order(request):
             if not check_food(cart, kitchen_id):
                 messages.error(request, 'Iltimos savatingizni tekshiring! Buyurtma berish uchun hamma taomlar bitta oshxonaniki bo\'lishi kerak.')
                 return redirect('cart:cart', kitchen_id=kitchen_id)
-            if kitchen.get_orders:  # Assuming get_orders is a method of Kitchen
+            if kitchen.get_orders or user.kitchen.id == kitchen.id:  # Assuming get_orders is a method of Kitchen
                 if table_id:
                     table = get_object_or_404(Table, table_unique_id=table_id)
                     total_price = cart.get_total_price()
@@ -133,12 +133,26 @@ def make_order(request):
                         order_items.append(order_item)
 
                     if user.is_authenticated:
-                        order = Orders.objects.create(
-                            kitchen=kitchen,
-                            user=user,
-                            table=table,
-                            total_price=total_price
-                        )
+                        service_fee_amount = request.POST.get('service_fee_amount' or None)
+                        if not service_fee_amount:
+                            if kitchen.service_fee_amount:
+                                service_fee_amount = kitchen.service_fee_amount
+
+                        if service_fee_amount:
+                            order = Orders.objects.create(
+                                kitchen=kitchen,
+                                user=user,
+                                table=table,
+                                total_price=total_price,
+                                service_fee=service_fee_amount
+                            )
+                        else:
+                            order = Orders.objects.create(
+                                kitchen=kitchen,
+                                user=user,
+                                table=table,
+                                total_price=total_price
+                            )
                     else:
                         order = Orders.objects.create(
                                 kitchen=kitchen,
@@ -159,6 +173,7 @@ def make_order(request):
                     return redirect('main:menu', slug=kitchen.slug)
             else:
                 messages.error(request, 'Oshxona buyurtmalar qabul qila olmaydi!')
+                return redirect('cart:cart', kitchen_id=kitchen.id)
         else:
             messages.error(request, 'Oshxona tanlanmagan!')
             return redirect('orders:order_detail', kitchen_id=kitchen_id)

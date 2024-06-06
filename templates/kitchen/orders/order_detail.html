@@ -178,9 +178,17 @@ Buyurtma
         <div class="total">
             <div class="row">
                 <div class="col"> <b> Jami:</b> </div>
-                <div class="col d-flex justify-content-end"> <b>{{ order.total_price }}</b> </div>
+                <div class="col d-flex justify-content-end"> <b>{{ order.total_price }} so'm</b> </div>
             </div>
+            <div class="row">
+                <div class="col">  Xizmat haqi:</div>
+                <div class="col d-flex justify-content-end">{{ order.service_fee }} so'm</div>
+            </div>
+            {% if request.user.kitchen.id == order.kitchen.id %}
+            <a href="{% url "orders:index" %}" class="btn btn-primary d-flex mx-auto">Buyurtmalar</a>
+            {% else %}
             <a href="/"><button class="btn d-flex mx-auto">Bosh sahifa</button></a>
+            {% endif %}
         </div>
     </div>
 </div>

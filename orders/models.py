@@ -34,6 +34,7 @@ class Orders(models.Model):
     kitchen = models.ForeignKey(Kitchen, on_delete=models.SET_NULL, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     foods = models.ManyToManyField(OrderItems)
+    service_fee = models.IntegerField(default=0)
     table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True, blank=True)
     total_price = models.IntegerField()
     status = models.CharField(max_length=20, choices=order_status, default='new')
