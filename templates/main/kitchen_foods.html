@@ -27,10 +27,20 @@ Menu
     font-size: 18px;
     font-weight: bold;
     transition: all 0.3s ease;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 2px solid transparent;
   }
 
   .nav-link:hover {
-    color: #1f487e;
+    color: #333;
+    background-color: #f0f0f0;
+  }
+
+  .nav-link.active {
+    background-color: #6f42c1; /* Update this color to match your design */
+    color: #fff;
+    border: 2px solid #6f42c1; /* Update this color to match your design */
   }
 
   a {
@@ -60,6 +70,7 @@ Menu
     height: 200px; /* Set a fixed height for the card images */
     object-fit: cover; /* Ensure the images cover the entire space */
   }
+
   .card-image img {
     max-width: 100%;
     border-radius: 8px 0 0 8px;
@@ -117,22 +128,19 @@ Menu
   .m-100 {
     margin-bottom: 100px;
   }
-
-  
 </style>
 
 <nav class="container mb-3 sticky-nav">
-  <ul id="category-nav" class="nav nav-pills justify-content-center">
+  <ul id="category-nav" class="nav nav-pills justify-content-start flex-nowrap overflow-auto">
     {% for category in categories %}
       {% if category.food.all %}
         <li class="nav-item">
-          <a href="#{{category.slug}}" class="nav-link {% if forloop.first %}active{% endif %}">{{category.title}}</a>
+          <a href="#{{category.slug}}" class="nav-link {% if forloop.first %}active{% endif %}" onclick="scrollToSection('{{category.slug}}')">{{category.title}}</a>
         </li>
       {% endif %}
     {% endfor %}
   </ul>
 </nav>
-
 
 <main class="container pb-5 m-00">
   {% for category in categories %}
@@ -166,7 +174,6 @@ Menu
   {% endfor %}
 </main>
 
-
 <nav class="navbar fixed-bottom bottom-navbar navbar-expand-lg navbar-light bg-light pt-0">
   <div class="container-fluid">
     <a class="nav-link" href="{% url 'main:menu' kitchen.slug %}"><i class="fas fa-home navbar-icon"></i><span class="d-none d-lg-inline">Kategoriyalar</span></a>
@@ -181,7 +188,6 @@ Menu
     <a class="nav-link" href="{% url 'review:kitchen' kitchen.id %}"><i class="fas fa-comments navbar-icon"></i><span class="d-none d-lg-inline"> Sharhlar</span></a>
   </div>
 </nav>
-
 
 <script>
   $(document).ready(function() {
@@ -223,7 +229,7 @@ Menu
         data: JSON.stringify({ product_id: productId, kitchen_id: kitchenId }),
         success: function(response) {
           console.log('Product quantity updated successfully!', response);
-          if (response.cart[productId].quantity === 0) {
+          if (!response.cart[productId]) {
             $button.parent('.select-section').html("<button class='btn btn-primary add-to-cart' data-product-id='" + productId + "' data-kitchen-id='" + kitchenId + "'>Savatga qo'shish <i class='fas fa-cart-plus'></i></button>");
           } else {
             updateQuantity($button, response.cart[productId].quantity);
@@ -281,59 +287,37 @@ Menu
   window.addEventListener('scroll', function() {
     var scrollPosition = window.scrollY;
     var sections = document.querySelectorAll('section.category-section');
-
+    
     sections.forEach(function(section) {
-      var top = section.offsetTop;
+      var top = section.offsetTop - 100; // Offsetni mos ravishda o'zgartiring
       var bottom = top + section.offsetHeight;
-
+  
       if (scrollPosition >= top && scrollPosition < bottom) {
         var sectionId = section.getAttribute('id');
         setActiveNavigation(sectionId);
       }
     });
+  
+    // Sahifaning pastiga tushganligini tekshirish
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      var lastSection = sections[sections.length - 1];
+      var lastSectionId = lastSection.getAttribute('id');
+      setActiveNavigation(lastSectionId);
+    }
   });
-
+  
   function setActiveNavigation(sectionId) {
     var navItems = document.querySelectorAll('#category-nav .nav-link');
-    var activeItem = document.querySelector(`#category-nav .nav-link[href='#${sectionId}']`);
-
     navItems.forEach(function(item) {
       item.classList.remove('active');
-    });
-
-    if (activeItem) {
-      activeItem.classList.add('active');
-      centerActiveNavLink(activeItem);
-    }
-  }
-
-  function centerActiveNavLink(activeItem) {
-    var navContainer = document.querySelector('#category-nav');
-    var itemOffset = activeItem.offsetLeft - navContainer.offsetWidth / 2 + activeItem.offsetWidth / 2;
-    navContainer.scroll({
-      left: itemOffset,
-      behavior: 'smooth'
+      if (item.getAttribute('href').slice(1) === sectionId) {
+        item.classList.add('active');
+      }
     });
   }
+  
+  
 
-  // Center the first category on page load
-  document.addEventListener('DOMContentLoaded', function() {
-    var firstCategoryLink = document.querySelector('#category-nav .nav-link.active');
-    if (firstCategoryLink) {
-      centerActiveNavLink(firstCategoryLink);
-    }
-
-    // Add click event to nav links
-    var navLinks = document.querySelectorAll('#category-nav .nav-link');
-    navLinks.forEach(function(navLink) {
-      navLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        var targetId = this.getAttribute('href').substring(1);
-        scrollToSection(targetId);
-        setActiveNavigation(targetId);
-      });
-    });
-  });
 </script>
 
 {% endblock content %}
