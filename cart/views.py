@@ -14,10 +14,15 @@ def cart(request, kitchen_id):
     table = None
     get_orders = False
 
-    if table_number and kitchen.get_orders:
+    if table_number:
+        try:
+            table = get_object_or_404(Table, table_unique_id=table_number)
+        except Table.DoesNotExist:
+            table = None
+
+    if kitchen.get_orders:
         get_orders = True
-        table = get_object_or_404(Table, table_unique_id=table_number)
-    
+
     service_fee_amount = kitchen.service_fee_amount
     if kitchen.service_fee_text == '%':
         service_fee_amount = (service_fee_amount * cart.get_total_products_price()) // 100
