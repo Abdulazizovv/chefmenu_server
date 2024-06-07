@@ -31,6 +31,7 @@
                     <h5 class="card-title">{{ food.name }}</h5>
                     <p class="card-text">Tavsif: {{ food.description }}</p>
                     <p class="card-text"><strong>Narxi:</strong> {{ food.price }} so'm</p>
+                    <p class="card-text">Status: {% if food.is_active %} <span class="badge badge-success">Faol</span> {% else %} <span class="badge badge-danger">Faol emas</span> {% endif %}</p>
                 </div>
             </div>
         </div> 
@@ -62,8 +63,15 @@
                     <input type="number" class="form-control" id="foodPrice" name="foodPrice" step="0.01" value="{{ food.price }}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="foodImage" class="form-label">Food Image:</label>
+                    <label for="foodImage" class="form-label">Taom rasmi:</label>
                     <input type="file" class="form-control" id="foodImage" name="foodImage" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <label for="foodStatus" class="form-label">Status:</label>
+                    <select class="form-control" id="foodStatus" name="foodStatus" required>
+                        <option value="active" {% if food.is_active %} selected {% endif %}>Sotuvda</option>
+                        <option value="inactive" {% if not food.is_active %} selected {% endif %}>Sotuvda emas</option>
+                    </select>
                 </div>
                 <input type="hidden" name="foodId" value="{{food.id}}">
                 <button type="submit" class="btn btn-primary"><i class="far fa-save"></i> Saqlash</button>

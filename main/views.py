@@ -217,16 +217,15 @@ def kitchen_foods(request, slug):
     return render(request, "main/kitchen_foods.html", context=context)
 
 
+
 def category_foods(request, kitchen_slug, category_slug):
     kitchen = get_object_or_404(Kitchen, slug=kitchen_slug)
     categories = FoodCategory.objects.filter(kitchen=kitchen)
     category = get_object_or_404(FoodCategory, slug=category_slug)
-    foods = Food.objects.filter(category=category)
     context = {
         "categories": categories,
         "kitchen": kitchen,
         "category": category,
-        "foods": foods,
     }
     return render(request, "main/category_foods.html", context=context)
 

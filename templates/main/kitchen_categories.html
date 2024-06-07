@@ -113,7 +113,7 @@
                         Kategoriyalar
                     </h2>
                     {% for category in categories %}
-                    {% if category.food.all %}
+                    {% if category.active_foods %}
                     <li class="list-group-item">
                         <a href="{% url "main:foods" kitchen.slug %}#{{category.slug}}" class="category-link">
                             <div class="d-flex align-items-center justify-content">

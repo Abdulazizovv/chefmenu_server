@@ -26,6 +26,10 @@ class FoodCategory(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=500)
 
+    @property
+    def active_foods(self):
+        return self.food.filter(is_active=True)
+
     def __str__(self):
         return self.title
 
@@ -39,6 +43,11 @@ class FoodCategory(models.Model):
                 counter += 1
             self.slug = slug
         super().save(*args, **kwargs)
+
+
+class ActiveFoodManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
 
 
 class Food(models.Model):
@@ -58,7 +67,7 @@ class Food(models.Model):
         ordering = ('-created', )
     
     def __str__(self):
-        return self.name
+        return self.name    
 
 
 class FoodVariant(models.Model):

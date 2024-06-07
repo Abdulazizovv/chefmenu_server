@@ -224,7 +224,7 @@ def edit_food_details(request):
         food_description = request.POST.get('foodDescription')
         food_price = request.POST.get('foodPrice')
         food_image = request.FILES.get('foodImage')
-        print(food_category_id)
+        food_status = request.POST.get('foodStatus')
         # Validate food_id
         if not food_id:
             return HttpResponseBadRequest("Food ID is required")
@@ -241,6 +241,11 @@ def edit_food_details(request):
         food.description = food_description
         food.price = food_price
 
+        if food_status == "active":
+            food.is_active = True
+        elif food_status == "inactive":
+            food.is_active = False
+
         # Update food image if provided
         if food_image:
             food.image = food_image
@@ -248,7 +253,7 @@ def edit_food_details(request):
         # Save changes
         food.save()
 
-        messages.success(request, "Food details updated successfully!")
+        messages.success(request, "Taom muvaffaqqiyatli o'zgartirildi!")
         return redirect("menu:edit_food", food_id=food_id)
 
     # Invalid request method

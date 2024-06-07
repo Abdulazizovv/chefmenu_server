@@ -133,7 +133,7 @@ Menu
 <nav class="container mb-3 sticky-nav">
   <ul id="category-nav" class="nav nav-pills justify-content-start flex-nowrap overflow-auto">
     {% for category in categories %}
-      {% if category.food.all %}
+      {% if category.active_foods %}
         <li class="nav-item">
           <a href="#{{category.slug}}" class="nav-link {% if forloop.first %}active{% endif %}" onclick="scrollToSection('{{category.slug}}')">{{category.title}}</a>
         </li>
@@ -144,33 +144,33 @@ Menu
 
 <main class="container pb-5 m-00">
   {% for category in categories %}
-  {% if category.food.all %}
-  <section id="{{category.slug}}" class="category-section">
-    <h2 class="category-title">{{category.title}}</h2>
-    <div class="container card-container">
-      {% for food in category.food.all %}
-      <div class="card card-sl">
-        <div class="card-body">
-          <img src="{{ food.image.url }}" alt="{{ food.name }}" class="card-img-top">
-          <div class="card-body-details">
-            <h5 class="card-title">{{ food.name }}</h5>
-            <p class="card-text"><b>Narxi: {{ food.price }} so'm</b></p>
-            <div class="select-section">
-              {% if cart|dict_key:food.id %}
-              <button class="btn btn-primary quantity-control-btn" data-action="remove" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">-</button>
-              <span class="quantity">{{ cart|get_quantity:food.id }}</span>
-              <button class="btn btn-primary quantity-control-btn" data-action="add" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">+</button>
-              {% else %}
-                <button class="btn btn-primary add-to-cart" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">Savatga qo'shish <i class="fas fa-cart-plus"></i></button>
-              {% endif %}
+    {% if category.active_foods %}
+      <section id="{{ category.slug }}" class="category-section">
+        <h2 class="category-title">{{ category.title }}</h2>
+        <div class="container card-container">
+          {% for food in category.active_foods %}
+            <div class="card card-sl">
+              <div class="card-body">
+                <img src="{{ food.image.url }}" alt="{{ food.name }}" class="card-img-top">
+                <div class="card-body-details">
+                  <h5 class="card-title">{{ food.name }}</h5>
+                  <p class="card-text"><b>Narxi: {{ food.price }} so'm</b></p>
+                  <div class="select-section">
+                    {% if cart|dict_key:food.id %}
+                      <button class="btn btn-primary quantity-control-btn" data-action="remove" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">-</button>
+                      <span class="quantity">{{ cart|get_quantity:food.id }}</span>
+                      <button class="btn btn-primary quantity-control-btn" data-action="add" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">+</button>
+                    {% else %}
+                      <button class="btn btn-primary add-to-cart" data-product-id="{{ food.id }}" data-kitchen-id="{{ kitchen.id }}">Savatga qo'shish <i class="fas fa-cart-plus"></i></button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          {% endfor %}
         </div>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
-  {% endif %}
+      </section>
+    {% endif %}
   {% endfor %}
 </main>
 

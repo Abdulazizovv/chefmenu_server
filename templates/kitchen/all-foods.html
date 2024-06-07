@@ -40,6 +40,7 @@ Barcha taomlar
                     <h5 class="card-title">{{ food.name }}</h5>
                     <p class="card-text">Tavsif: {{ food.description }}</p>
                     <p class="card-text"><strong>Narxi: {{ food.price }} so'm</strong></p>
+                    <p class="card-text">Status: {% if food.is_active %}<span class="badge badge-success">Sotuvda</span>{% else %}<span class="badge badge-danger">Sotuvda emas</span>{% endif %}</p>
                     {% if food.has_variants %}
                     <button type="button" class="btn btn-info btn-sm" data-toggle="collapse" data-target="#foodVariants{{ food.id }}" aria-expanded="false" aria-controls="foodVariants{{ food.id }}">
                         View Variants ({{ food.variants.count }})
