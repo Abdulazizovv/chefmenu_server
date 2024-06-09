@@ -41,7 +41,7 @@ Buyurtmalar tarixi
                     <select id="tableFilter" class="form-control" name="table">
                         <option value="">Hammasi</option>
                         {% for table in tables %}
-                        <option value="{{table.id}}" {% if selected_table == table.id %}selected{% endif %}>{{table.number}}</option>
+                        <option value="{{table.id}}" {% if selected_table == table.id %}selected{% endif %}>{% if table.name %}{{table.name}}{% else %}{{table.number}}{% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>

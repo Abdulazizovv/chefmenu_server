@@ -147,7 +147,7 @@ def add_food(request):
         #     return redirect('menu:category_foods', title=category.slug)
 
         if food_image:
-            validator = FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+            validator = FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp', 'heic'])
             try:
                 validator(food_image)
             except ValidationError as e:

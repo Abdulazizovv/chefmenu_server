@@ -60,7 +60,7 @@ def change_order_status(request):
 @only_kitchen
 def history_orders(request):
     orders = Orders.objects.all().order_by('-created')
-    tables = Table.objects.filter(kitchen=request.user.kitchen)
+    tables = Table.objects.filter(kitchen=request.user.kitchen).order_by("number")
     selected_status = request.GET.get('status' or None)
     date = request.GET.get('date' or None)
     selected_table = request.GET.get('table' or None)
