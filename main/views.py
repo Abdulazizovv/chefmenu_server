@@ -13,7 +13,7 @@ from django.db.models.functions import TruncMonth
 from table.models import Table
 from users.models import User, Kitchen
 from .models import ContactMessages, Menu, FoodCategory, Food
-from menu.decorators import only_kitchen
+from menu.decorators import only_kitchen, only_manager
 from cart.cart import Cart
 from orders.models import Orders
 from verification.utils import check_verification_code
@@ -74,7 +74,7 @@ def generate_kitchen_stats(kitchen):
         "most_sold_foods": most_sold_foods,
     }
 
-
+@only_manager
 def index(request):
     if request.user.is_authenticated and request.user.is_kitchen:
         kitchen = request.user.kitchen

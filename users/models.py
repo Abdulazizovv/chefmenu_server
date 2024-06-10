@@ -93,6 +93,9 @@ class Kitchen(models.Model):
 
 # Custom User
 class User(AbstractBaseUser, PermissionsMixin):
+
+    type_choices = [('user', 'User'), ('manager', 'Manager'), ('employee', 'Employee')]
+
     phone_number = models.CharField(max_length=25, unique=True)
 
     full_name = models.CharField(max_length=255, null=True, blank=True)
@@ -102,6 +105,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     is_kitchen = models.BooleanField(default=False)
     kitchen = models.ForeignKey(Kitchen, on_delete=models.SET_NULL, null=True, blank=True)
+    user_type = models.CharField(max_length=255, choices=type_choices, default='user')
 
     objects = CustomUserManager()
 

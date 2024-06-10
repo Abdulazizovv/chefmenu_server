@@ -13,3 +13,18 @@ def only_kitchen(view_func):
         messages.error(request, 'Ruxsat yo`q')
         return redirect('main:index')
     return wrapper
+
+
+def only_manager(view_func):
+    def wrapper(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if request.user.is_kitchen:
+                if request.user.user_type == 'manager':
+                    return view_func(request, *args, **kwargs)
+                else:
+                    messages.error(request, 'Ruxsat yo`q! Siz faqatgina buyurtmalar bilan ishlay olasiz!')
+                    return redirect('orders:index')
+                
+            return redirect('main:index')
+        return redirect('main:index')
+    return wrapper

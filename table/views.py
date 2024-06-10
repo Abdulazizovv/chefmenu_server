@@ -1,6 +1,6 @@
 import logging
 from django.shortcuts import redirect, render
-from menu.decorators import only_kitchen
+from menu.decorators import only_kitchen, only_manager
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from users.models import Kitchen
@@ -13,6 +13,8 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 import os
 
+
+@only_manager
 @only_kitchen
 def index(request):
     page = request.GET.get("page" or None)
