@@ -74,18 +74,22 @@ def generate_kitchen_stats(kitchen):
         "most_sold_foods": most_sold_foods,
     }
 
-@only_manager
+
 def index(request):
     if request.user.is_authenticated and request.user.is_kitchen:
-        kitchen = request.user.kitchen
-        stats = generate_kitchen_stats(kitchen)
-        context = {
-            'parent': 'kitchen',
-            'child': 'dashboard',
-            'kitchen': kitchen,
-            'stats': stats,
-        }
-        return render(request, 'kitchen/index.html', context=context)
+        if request.user.user_type == 'manager':
+            kitchen = request.user.kitchen
+            stats = generate_kitchen_stats(kitchen)
+            context = {
+                'parent': 'kitchen',
+                'child': 'dashboard',
+                'kitchen': kitchen,
+                'stats': stats,
+            }
+            return render(request, 'kitchen/index.html', context=context)
+        elif request.user.user_type == 'employee':
+            return redirect('orders:index')
+
 
     page = request.GET.get('page', 1)
     all_kitchens = Kitchen.objects.all().order_by('created')
