@@ -1,7 +1,7 @@
 import json
 import random
 import datetime
-
+import logging
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
@@ -270,7 +270,8 @@ def register(request):
                         login(request, user)
                         messages.success(request, "Registration successful!")
                         return redirect('main:index')
-                except:
+                except Exception as err:
+                    logging.error(err)
                     messages.error(request, "Something went wrong!")
                     return redirect('main:register')
             else:

@@ -27,3 +27,12 @@ def check_user_exists(user_id):
     if user:
         return user.phone_number
     return False
+
+
+@sync_to_async
+def get_tg_user_by_phone(phone_number):
+    phone_number = '+998' + str(phone_number)
+    user = BotUsers.objects.filter(phone_number=phone_number).first()
+    if user:
+        return user
+    return False

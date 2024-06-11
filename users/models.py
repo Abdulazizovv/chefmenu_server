@@ -4,6 +4,8 @@ import uuid
 from django.utils.text import slugify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from bot.utils.functions import send_user_created_message as notify
+from asgiref.sync import async_to_sync
 
 
 # custom user manager
@@ -169,6 +171,8 @@ def create_user_profile(sender, instance, created, **kwargs):
         else:
             # Create UserProfile for regular user
             UserProfile.objects.create(user=instance, username=instance.phone_number)
+            # notify user about successful registration via telegram
+            async_to_sync(notify)(instance.phone_number)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
