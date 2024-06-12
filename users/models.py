@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from bot.utils.functions import send_user_created_message as notify
 from asgiref.sync import async_to_sync
+from bot.utils.db_api.db import get_tg_user_by_phone
 
 
 # custom user manager
@@ -145,6 +146,7 @@ class UserProfile(models.Model):
     picture = models.ImageField(upload_to='users/pictures/', default="default-user-image.jpg", null=True, blank=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, null=True, blank=True)
+    tg_profile = models.ForeignKey('botapp.BotUsers', on_delete=models.SET_NULL, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -155,7 +157,7 @@ class UserProfile(models.Model):
 
 
     def __str__(self) -> str:
-        return self.full_name
+        return self.first_name
     
 
 @receiver(post_save, sender=User)
@@ -170,7 +172,17 @@ def create_user_profile(sender, instance, created, **kwargs):
                 )
         else:
             # Create UserProfile for regular user
-            UserProfile.objects.create(user=instance, username=instance.phone_number)
+            tg_profile = async_to_sync(get_tg_user_by_phone)(instance.phone_number)
+            if tg_profile:
+                UserProfile.objects.create(
+                    user=instance, 
+                    username=instance.phone_number,
+                    first_name=tg_profile.first_name,
+                    tg_profile=tg_profile
+                    )
+            else:
+                UserProfile.objects.create(user=instance, username=instance.phone_number, first_name=instance.full_name)
+            
             # notify user about successful registration via telegram
             async_to_sync(notify)(instance.phone_number)
 
@@ -183,3 +195,14 @@ def save_user_profile(sender, instance, **kwargs):
     else:
         # Save UserProfile for regular user
         instance.profile.save()
+
+
+class KitchenOrderReceiver(models.Model):
+    kitchen = models.ForeignKey(Kitchen, on_delete=models.CASCADE, related_name='order_receivers')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_receivers')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return str(self.user.full_name) + ' - ' + str(self.kitchen.title)
+    

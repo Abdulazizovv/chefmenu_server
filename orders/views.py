@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import serializers, viewsets
-
+from django.db import transaction
 from table.models import Table
 from .models import Orders, OrderItems
 from .serializers import OrderSerializer
@@ -106,66 +106,60 @@ def make_order(request):
     cart = Cart(request)
     table_id = request.session.get('table_id')
     user = request.user
+
     if request.method == "POST":
-        
         kitchen_id = request.POST.get('kitchen_id')
         if kitchen_id:
             kitchen = get_object_or_404(Kitchen, id=int(kitchen_id))
             if not cart:
                 messages.error(request, 'Savatingiz bo\'sh')
                 return redirect('cart:cart', kitchen_id=kitchen_id)
+
             if not check_food(cart, kitchen_id):
                 messages.error(request, 'Iltimos savatingizni tekshiring! Buyurtma berish uchun hamma taomlar bitta oshxonaniki bo\'lishi kerak.')
                 return redirect('cart:cart', kitchen_id=kitchen_id)
-            if kitchen.get_orders or user.kitchen.id == kitchen.id:  # Assuming get_orders is a method of Kitchen
+
+            if kitchen.get_orders or (user.is_authenticated and user.kitchen.id == kitchen.id):  # Assuming get_orders is a method of Kitchen
                 if table_id:
                     table = get_object_or_404(Table, table_unique_id=table_id)
                     total_price = cart.get_total_price()
                     order_items = []
 
-                    for item in cart:
-                        order_item = OrderItems.objects.create(
-                            food=get_object_or_404(Food, id=item['product_id']),
-                            quantity=item['quantity'],
-                            price=item['price'],
-                            total_price=item['total_price']
-                        )
-                        order_items.append(order_item)
+                    with transaction.atomic():  # Ensure atomic transaction
+                        for item in cart:
+                            order_item = OrderItems.objects.create(
+                                food=get_object_or_404(Food, id=item['product_id']),
+                                quantity=item['quantity'],
+                                price=item['price'],
+                                total_price=item['total_price']
+                            )
+                            order_items.append(order_item)
 
-                    if user.is_authenticated:
-                        service_fee_amount = request.POST.get('service_fee_amount' or None)
-                        if not service_fee_amount:
-                            if kitchen.service_fee_amount:
-                                service_fee_amount = kitchen.service_fee_amount
+                        if user.is_authenticated:
+                            service_fee_amount = request.POST.get('service_fee_amount')
+                            if not service_fee_amount and kitchen.service_fee_amount:
+                                service_fee_amount = (int(item['total_price']) / 100) * int(kitchen.service_fee_amount)
 
-                        if service_fee_amount:
                             order = Orders.objects.create(
                                 kitchen=kitchen,
                                 user=user,
                                 table=table,
                                 total_price=total_price,
-                                service_fee=service_fee_amount
+                                service_fee=service_fee_amount or 0
                             )
                         else:
                             order = Orders.objects.create(
                                 kitchen=kitchen,
-                                user=user,
                                 table=table,
                                 total_price=total_price
                             )
-                    else:
-                        order = Orders.objects.create(
-                                kitchen=kitchen,
-                                table=table,
-                                total_price=total_price
-                            )
-                    order.foods.set(order_items)
-                    order.save()
-                    
+                        order.foods.set(order_items)
+                        order.save()
+
                     cart.clear()
                     del request.session['table_id']  # Remove session variable
                     messages.success(request, 'Buyurtma qabul qilindi')
-                    
+
                     # Redirect to a different URL after processing the POST request
                     return redirect('orders:order_detail', order_id=order.order_number)
                 else:
@@ -177,7 +171,6 @@ def make_order(request):
         else:
             messages.error(request, 'Oshxona tanlanmagan!')
             return redirect('orders:order_detail', kitchen_id=kitchen_id)
-
     else:
         messages.error(request, 'Get method is not allowed')
         return redirect('main:index')

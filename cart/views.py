@@ -17,11 +17,9 @@ def cart(request, kitchen_id):
     if table_number:
         try:
             table = get_object_or_404(Table, table_unique_id=table_number)
+            get_orders = True
         except Table.DoesNotExist:
             table = None
-
-    if kitchen.get_orders:
-        get_orders = True
 
     service_fee_amount = kitchen.service_fee_amount
     if kitchen.service_fee_text == '%':
