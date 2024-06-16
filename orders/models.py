@@ -39,8 +39,8 @@ class Orders(models.Model):
     total_price = models.IntegerField()
     status = models.CharField(max_length=20, choices=order_status, default='new')
 
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(default=datetime.now, editable=False)
+    updated = models.DateTimeField(default=datetime.now, editable=False)
 
     def __str__(self) -> str:
         return f'Order #{self.id}'
