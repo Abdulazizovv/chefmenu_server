@@ -43,7 +43,7 @@ Buyurtmalar
                         {% if order.user %}{{ order.user.full_name }}{% else %}Anonim{% endif %}
                         
                     </h5>
-                    <p class="card-text">Buyurtma Vaqti: {{ order.created|uzbek_timesince }}</p>
+                    <p class="card-text">Buyurtma Vaqti: {{ order.created|date:"H:i | d-m-Y" }}</p>
                     <p class="card-text">Xizmat haqi: {{ order.service_fee }} so'm</p>
                     Buyurtma berildi:
                     <ul class="list-group list-group-light">
