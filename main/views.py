@@ -258,7 +258,7 @@ def register(request):
         verification_code = request.POST.get('verification_code')
 
         if check_verification_code(phone_number=phone_number, code=verification_code):
-            if password1 == password2:
+            if password1 and password1 == password2:
                 try:
                     user = User.objects.create_user(
                         phone_number=phone_number,
@@ -268,14 +268,15 @@ def register(request):
                     user = authenticate(request, phone_number=phone_number, password=password1)
                     if user:
                         login(request, user)
-                        messages.success(request, "Registration successful!")
+                        messages.success(request, "Ro'yxatdan muvaffaqqiyatli o'tildi!\nTabriklaymiz! Endi funksiyalarimizdan foydalanishingiz mumkin!")
                         return redirect('main:index')
                 except Exception as err:
                     logging.error(err)
-                    messages.error(request, "Something went wrong!")
+                    messages.error(request, "Nimadir xato ketdi!\nIltimos tekshirib qaytadan urinib ko'ring!")
                     return redirect('main:register')
             else:
-                messages.error(request, "Passwords do not match!")
+                messages.error(request, "Parollar mos emas!")
+                return redirect('main:register')
     return render(request, 'kitchen/auth/register.html')
 
 
