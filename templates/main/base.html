@@ -14,7 +14,7 @@
     <!-- for facebook -->
     <meta property="og:title" content="ChefMenu - Online menu">
     <meta property="og:description" content="Oshxona va restoranlar uchun onlayn menyu xizmati|онлайн-меню для ресторанов">
-    <meta property="og:image" content="{% static "img/logo.jpg" %}">
+    <meta property="og:image" content="{% static 'img/logo.jpg' %}">
     <meta property="og:url" content="https://chefmenu.uz">
     <meta property="og:type" content="website">
 
@@ -23,45 +23,44 @@
     <meta name="twitter:site" content="@chefmenu">
     <meta name="twitter:title" content="chefmenu - online menu">
     <meta name="twitter:description" content="Oshxona va restoranlar uchun onlayn menyu xizmati|онлайн-меню для ресторанов">
-    <meta name="twitter:image" content="{% static "img/logo.jpg" %}">
+    <meta name="twitter:image" content="{% static 'img/logo.jpg' %}">
     <meta name="twitter:url" content="{% block url %}{% endblock url %}">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static "favicon/apple-touch-icon.png" %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static "favicon/favicon-32x32.png" %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static "favicon/favicon-16x16.png" %}">
-    <link rel="manifest" href="{% static "favicon/site.webmanifest" %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
     <link rel="canonical" href="https://chefmenu.uz">
 
     <!-- SEO Scripts -->
     <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "Web service",
-            "name": "ChefMenu",
-            "image": "{% static "img/logo.jpg" %}",
-            "@id": "",
-            "url": "https://chefmenu.uz",
-            "telephone": "",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Fergana",
-                "addressLocality": "Fergana",
-                "addressRegion": "Fergana",
-                "postalCode": "150100",
-                "addressCountry": "Uzbekistan"
-            },
-            
+    {
+        "@context": "https://schema.org",
+        "@type": "WebService",
+        "name": "ChefMenu",
+        "image": "{% static 'img/logo.jpg' %}",
+        "@id": "",
+        "url": "https://chefmenu.uz",
+        "telephone": "",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Fergana",
+            "addressLocality": "Fergana",
+            "addressRegion": "Fergana",
+            "postalCode": "150100",
+            "addressCountry": "Uzbekistan"
         }
-        </script>
-
+    }
+    </script>
 
     {% comment %} <script src="https://kit.fontawesome.com/b67c8e9692.js" crossorigin="anonymous"></script> {% endcomment %}
-    <link rel="stylesheet" href="{% static "kitchen/vendor/fontawesome-free/css/all.min.css" %}">
+    <link rel="stylesheet" href="{% static 'kitchen/vendor/fontawesome-free/css/all.min.css' %}">
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,700,900&display=swap" rel="stylesheet">
-    {% include "main/links.html" %}
+    {% include 'main/links.html' %}
     <title>{% block title %}{% endblock title %}</title>
     {% block head %}{% endblock head %}
 </head>
+    
 <body>
 
     <style>
