@@ -2,6 +2,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8553M5MVF2"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-8553M5MVF2');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -153,14 +162,14 @@
                     </li>
                     {% if request.user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url "main:user_profile" %}">Profil</a>
+                        <a class="nav-link {% if request.path == '/user/profile/' %} active{% endif %}" href="{% url "main:user_profile" %}">Profil</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url "main:login" %}">Login</a>
+                        <a class="nav-link {% if request.path == '/login/' %} active{% endif %}" href="{% url "main:login" %}">Kirish</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url "main:register" %}">Ro'yxatdan o'tish</a>
+                        <a class="nav-link {% if request.path == '/register/' %} active{% endif %}" href="{% url "main:register" %}">Ro'yxatdan o'tish</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -187,5 +196,9 @@
     
 
     <script src="{% static "js/bootstrap/main.js" %}"></script>
+
+    {% block footer %}
+    
+    {% endblock footer %}
 </body>
 </html>
